@@ -3,31 +3,24 @@ import plotly.express as px
 import pandas as pd
 from urllib.request import urlopen
 import json
+from data_prep import get_data
 app = Dash(__name__)
 
 # assume you have a "long-form" data frame
 # see https://plotly.com/python/px-arguments/ for more options
-df = pd.DataFrame({
-    "Fruit": ["Apples", "Oranges", "Bananas", "Apples", "Oranges", "Bananas"],
-    "Amount": [4, 1, 2, 2, 4, 5],
-    "City": ["SF", "SF", "SF", "Montreal", "Montreal", "Montreal"]
-})
 
-fig = px.bar(df, x="Fruit", y="Amount", color="City", barmode="group")
-
-
-with open('./data/geojson_counties.json') as json_file:
+with open('geojson_counties.json') as json_file:
     counties = json.load(json_file)
 
-import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/fips-unemp-16.csv",
-                   dtype={"fips": str})
+data=get_data()
+
+
 
 import plotly.express as px
 
-fig = px.choropleth_mapbox(df, geojson=counties, locations='fips', color='unemp',
+fig = px.choropleth_mapbox(data, geojson=counties, locations='fips', color='land_area (km^2)',
                            color_continuous_scale="Viridis",
-                           range_color=(0, 12),
+                           range_color=(data['land_area (km^2)'].min(),data['land_area (km^2)'].max()),
                            mapbox_style="carto-positron",
                            zoom=3, center = {"lat": 37.0902, "lon": -95.7129},
                            opacity=0.5,
