@@ -143,6 +143,8 @@ def get_data():
     #filters so that only counties with the same name in the same state are matched
     merging=merging[merging.STATE==merging.state]
 
+    #adds a 0 in front of fips with too few characters. As it is dropped when they are encoded as ints
+    merging.fips=merging.fips.apply(lambda x: str("0"*int((5-len(str(x))))+str(x)) if len(str(x))<5 else str(x))
     
     print(merging.shape)
     #TODO: something off about the shape changing? Are we losing some counties??
