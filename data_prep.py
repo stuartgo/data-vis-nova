@@ -1,5 +1,5 @@
 import pandas as pd
-import json
+
 state_abbreviation_to_name = {
 	"AL": "Alabama",
 	"AK": "Alaska",
@@ -132,5 +132,3 @@ def get_data():
 
 	#TODO: something off about the shape changing? Are we losing some counties??
 	return data
-
-
