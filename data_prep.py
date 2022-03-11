@@ -118,38 +118,19 @@ fips_code_to_name = {
 
 
 def get_data():
-    """Generates dataframe with all data including shape of counties
-    """
-    data=pd.read_csv("counties.csv")
-    #changes name from code to actual name of state
-    data=data.replace({"state":state_abbreviation_to_name})
-    geodata=pd.read_json("geojson_counties.json")
+	"""loads data
 
-    #opens up geodata into a more accessible dataframe
-    geodata=geodata.features.apply(pd.Series)
-    geodata=pd.concat([geodata,geodata.properties.apply(pd.Series)],axis=1)
-    geodata.drop(columns=["properties"],inplace=True)
+	Returns:
+		Dataframe: Data from counties csv
+	"""
+	data=pd.read_csv("counties.csv")
+	#changes name from code to actual name of state
+	data=data.replace({"state":state_abbreviation_to_name})
 
-    #creates new column with name in same format as in "data"
-    geodata["County name"]=geodata.NAME+" "+geodata.LSAD
-    geodata["County name"]=geodata["County name"].str.lower()
+	#adds a 0 in front of fips with too few characters. As it is dropped when they are encoded as ints
+	data.fips=data.fips.apply(lambda x: str("0"*int((5-len(str(x))))+str(x)) if len(str(x))<5 else str(x))
 
-    #changes from fips code to name of state
-    geodata=geodata.replace({"STATE":fips_code_to_name})
-    print(geodata.shape)
-    #merges data and geodata
-    merging=pd.merge(geodata[["County name","STATE","COUNTY"]],data,how="inner",left_on="County name",right_on="name")
-
-    #filters so that only counties with the same name in the same state are matched
-    merging=merging[merging.STATE==merging.state]
-
-    #adds a 0 in front of fips with too few characters. As it is dropped when they are encoded as ints
-    merging.fips=merging.fips.apply(lambda x: str("0"*int((5-len(str(x))))+str(x)) if len(str(x))<5 else str(x))
-    
-    print(merging.shape)
-    #TODO: something off about the shape changing? Are we losing some counties??
-
-    
-    return merging
+	#TODO: something off about the shape changing? Are we losing some counties??
+	return data
 
 
