@@ -14,9 +14,7 @@ app = Dash(__name__)
 with open('geojson_counties.json') as json_file:
     counties = json.load(json_file)
 
-data=get_data()
-
-import plotly.express as px
+data = get_data()
 
 
 cols_dd=["male","female","population/2010","life-expectancy"]
