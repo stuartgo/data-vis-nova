@@ -24,7 +24,7 @@ app.layout = html.Div([
     ),
     dcc.Slider(
         min = 2000, max = 2020, step = 4, value = 2020, # min, max, step, default of the slider
-        id = "select_year_slider", # unique id of the slider object
+        id = "year_slider", # unique id of the slider object
         marks = {
             2000: {"label": "2000", "style": {"color": "red"}},
             2004: {"label": "2004", "style": {"color": "red"}},
@@ -37,7 +37,7 @@ app.layout = html.Div([
     ),
     daq.ToggleSwitch(
         id='state_county_toggle',
-        value=False,
+        value=True,
         label='State?',
         labelPosition='bottom'
     ),
@@ -51,7 +51,7 @@ app.layout = html.Div([
 
 @app.callback(
     Output(component_id = "usa_map", component_property = "figure"),
-    Input(component_id = "select_year_slider", component_property = "value"),
+    Input(component_id = "year_slider", component_property = "value"),
     Input(component_id = "state_county_toggle", component_property = "value")
 )
 
@@ -73,22 +73,34 @@ def update_graph(year, state):
             locationmode = "USA-states",
             locations = "state_po",
             scope = "usa",
-            color="party",
+            color = "party",
             color_discrete_map = {"REPUBLICAN": "red", "DEMOCRAT": "blue", "DEMOCRATIC-FARMER-LABOR": "green"},
             hover_data = ["state"],
             template = "plotly_dark"
         )
+        fig.add_scattergeo(
+            locationmode = "USA-states",
+            locations = pres_states_winners_copy["state_po"],
+            text = pres_states_winners_copy["state_po"],
+            featureidkey = "properties.NAME_3",
+            mode = "text",
+            textfont = dict(family = "arial", size = 10)
+        )
+        
     else:
         fig = px.choropleth(
             data_frame = pres_county_winners_copy,
-            geojson=counties,
+            geojson = counties,
             locations = "county_fips",
-            color="party",
+            color = "party",
             color_discrete_map = {"REPUBLICAN": "red", "DEMOCRAT": "blue", "DEMOCRATIC-FARMER-LABOR": "green"},
             scope = "usa",
             hover_data = ["county_name","candidate"],
             template = "plotly_dark"
         )
+        fig.update_traces(marker_line_width = 0, marker_opacity = 0.8)
+        fig.update_layout(margin = {"r": 0, "t": 0, "l": 0, "b": 0})
+        fig.update_geos(showsubunits = True, subunitcolor = "white")
     return fig
 
 
