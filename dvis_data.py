@@ -110,5 +110,3 @@ pres_states_winners["swing"]=pres_states_winners.apply(lambda x: swing(x),axis=1
 #geojson is required when working with counties as its not built in
 with open('geojson_counties.json') as json_file:
     counties = json.load(json_file)
-
-

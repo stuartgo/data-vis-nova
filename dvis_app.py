@@ -67,7 +67,7 @@ def update_graph(year, state):
     pres_county_winners_copy = pres_county_winners.copy()
     pres_county_winners_copy = pres_county_winners_copy[pres_county_winners_copy.year == year]
 
-    # chloropleth
+    # choropleth
     if state:
         fig = px.choropleth(
             data_frame = pres_states_winners_copy,
@@ -95,3 +95,4 @@ def update_graph(year, state):
 
 if __name__ == "__main__":
     app.run_server(debug = True)
+
