@@ -56,49 +56,56 @@ pres_county_winners = pres_counties.copy()
 pres_county_winners.sort_values(["year","county_fips","candidatevotes"],ascending=False,inplace=True)
 pres_county_winners.drop_duplicates(["county_fips","year"],inplace=True)
 
+#rename column
+pres_states_winners.rename(columns={"party_detailed":"party"},inplace=True)
+
+
+
 #Find the previous winner for each county
-def previous_winner(row):
-    if row.name==len(pres_county_winners)-1:
-        return None
-    prev_row=pres_county_winners.iloc[row.name+1,:]
-    if prev_row.county_fips==row.county_fips:
-        return prev_row.party
+def previous_winner(row,state):
+    if state:
+        if row.name==len(pres_states_winners)-1:
+            return None
+        prev_row=pres_states_winners.iloc[row.name+1,:]
+        if prev_row.state_fips==row.state_fips:
+            return prev_row.party
     else:
-        return None
-
-
+        if row.name==len(pres_county_winners)-1:
+            return None
+        prev_row=pres_county_winners.iloc[row.name+1,:]
+        if prev_row.county_fips==row.county_fips:
+            return prev_row.party
+    return None
 
 pres_county_winners.sort_values(["county_fips","year"],ascending=[True,False],inplace=True)
 pres_county_winners.reset_index(inplace=True)
-print(pres_county_winners)
-pres_county_winners["prev_winner"]=pres_county_winners.apply(lambda x: previous_winner(x) ,axis=1)
+pres_county_winners["prev_party"]=pres_county_winners.apply(lambda x: previous_winner(x,False) ,axis=1)
 
-print(pres_county_winners)
 
-# Add color code to pres_states_winners dataframe based on winning party
-# color_code_state = []
-# for index, year, party in zip(pres_states_winners.index, pres_states_winners.year, pres_states_winners.party_detailed):
-#     # 51 states: subtracting 51 to current index retrieves winning party on that same state for the previous election
-#     if year >= 2000: # prevents index out of range error for 1996 (there's no 1992 data)
-#         prev_party = pres_states_winners.loc[index-51, "party_detailed"]
-#         if (party == "REPUBLICAN") and (prev_party == "REPUBLICAN"):
-#             # red if winning party was republican for two elections in a row
-#             color_code_state.append("red")
-#         if (party == "REPUBLICAN") and (prev_party != "REPUBLICAN"):
-#             # red stripes if winning party changed from democrat to republican
-#             color_code_state.append("red_stripes")
-#         if (party == "DEMOCRAT") and (prev_party == "DEMOCRAT"):
-#             # blue if winning party was democrat for two elections in a row
-#             color_code_state.append("blue")
-#         if (party == "DEMOCRAT") and (prev_party != "DEMOCRAT"):
-#             # red stripes if winning party changed from republican to democrat
-#             color_code_state.append("blue_stripes")      
-#         if (party != "DEMOCRAT") and (party != "REPUBLICAN"):
-#             # choose another color for non-dem/rep parties (there's only one other)
-#             color_code_state.append("other")
-# pres_states_winners = pres_states_winners[pres_states_winners.year >= 2000]
-# pres_states_winners["color"] = color_code_state
+pres_states_winners.sort_values(["state_fips","year"],ascending=[True,False],inplace=True)
+pres_states_winners.reset_index(inplace=True)
+pres_states_winners["prev_party"]=pres_states_winners.apply(lambda x: previous_winner(x,True) ,axis=1)
 
+
+def swing(row):
+    if (row.party == "REPUBLICAN") and (row.prev_party == "REPUBLICAN"):
+        # red if winning party was republican for two elections in a row
+        return 0
+    if (row.party == "REPUBLICAN") and (row.prev_party != "REPUBLICAN"):
+        # red stripes if winning party changed from democrat to republican
+        return 1
+    if (row.party == "DEMOCRAT") and (row.prev_party == "DEMOCRAT"):
+        # blue if winning party was democrat for two elections in a row
+        return 0
+    if (row.party == "DEMOCRAT") and (row.prev_party != "DEMOCRAT"):
+        # red stripes if winning party changed from republican to democrat
+        return 1 
+    if (row.party != "DEMOCRAT") and (row.prev_party != "REPUBLICAN"):
+        # choose another color for non-dem/rep parties (there's only one other)
+        return 2
+
+pres_county_winners["swing"]=pres_county_winners.apply(lambda x: swing(x),axis=1)
+pres_states_winners["swing"]=pres_states_winners.apply(lambda x: swing(x),axis=1)
 
 
 #geojson is required when working with counties as its not built in

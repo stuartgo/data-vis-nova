@@ -1,6 +1,7 @@
 # POLITICAL LANDSCAPE OF THE USA IN THE 21ST CENTURY
 
 #### Import libraries/modules/data ####
+from lib2to3.pygram import pattern_symbols
 import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
@@ -64,9 +65,7 @@ def update_graph(year, state):
 
     pres_county_winners_copy = pres_county_winners.copy()
     pres_county_winners_copy = pres_county_winners_copy[pres_county_winners_copy.year == year]
-    print(pres_county_winners_copy)
 
-    print(state,year,type(year))
     # chloropleth
     if state:
         fig = px.choropleth(
@@ -74,7 +73,8 @@ def update_graph(year, state):
             locationmode = "USA-states",
             locations = "state_po",
             scope = "usa",
-            #color = "color",
+            color="party",
+            color_discrete_map = {"REPUBLICAN": "red", "DEMOCRAT": "blue", "DEMOCRATIC-FARMER-LABOR": "green"},
             hover_data = ["state"],
             template = "plotly_dark"
         )
@@ -83,7 +83,8 @@ def update_graph(year, state):
             data_frame = pres_county_winners_copy,
             geojson=counties,
             locations = "county_fips",
-            #color = "color",
+            color="party",
+            color_discrete_map = {"REPUBLICAN": "red", "DEMOCRAT": "blue", "DEMOCRATIC-FARMER-LABOR": "green"},
             scope = "usa",
             hover_data = ["county_name","candidate"],
             template = "plotly_dark"
