@@ -100,7 +100,7 @@ def update_graph(year, state):
         )
         fig.update_traces(marker_line_width = 0, marker_opacity = 0.8)
         fig.update_layout(margin = {"r": 0, "t": 0, "l": 0, "b": 0})
-        fig.update_geos(showsubunits = True, subunitcolor = "white")
+        fig.update_geos(showsubunits = True, subunitcolor = "darkgray")
     return fig
 
 
