@@ -22,7 +22,7 @@ app.layout = html.Div([
     ),
     dcc.Slider(
         min = 2000, max = 2020, step = 4, value = 2020, # min, max, step, default of the slider
-        id = "year_slider", # unique id of the slider object
+        id = "select_year", # unique id of the slider object
         marks = {
             2000: {"label": 2000}, 2004: {"label": 2004},
             2008: {"label": 2008}, 2012: {"label": 2012},
@@ -37,31 +37,34 @@ app.layout = html.Div([
 ])
 
 @app.callback(
-    [Output(component_id = "slider_output_container"),
-     Output(component_id = "usa_map")],
-    Input(component_id = "year_slider", component_property = "value")
+    Output(component_id = "usa_map", component_property = "figure"),
+    Input(component_id = "select_year", component_property = "value")
 )
 def update_graph(value):
     # checking values and type
     print(value)
     print(type(value))
 
-    container = f"Results for the {value} elections"
+    # container = f"Results for the {value} elections"
 
     # filtering election data for current year
-    pres_states_copy = pres_states.copy()
-    pres_states_copy = pres_states_copy[pres_states_copy.year == value]
+    pres_states_winners_copy = pres_states_winners.copy()
+    pres_states_winners_copy = pres_states_winners_copy[pres_states_winners_copy.year == value]
 
     # chloropleth
     fig = px.choropleth(
-        data_frame = pres_states_copy,
+        data_frame = pres_states_winners_copy,
         locationmode = "USA-states",
-        locations = "state_code",
+        locations = "state_po",
         scope = "usa",
-        color = "totalvotes"
+        color = "color",
+        hover_data = ["state"],
+        template = "plotly_dark"
     )
 
-    return
+    return fig
+
+
 
 if __name__ == "__main__":
     app.run_server(debug = False)
