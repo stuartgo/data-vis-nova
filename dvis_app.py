@@ -1,6 +1,7 @@
 # POLITICAL LANDSCAPE OF THE USA IN THE 21ST CENTURY
 
 #### Import libraries/modules/data ####
+from lib2to3.pygram import pattern_symbols
 import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
@@ -57,7 +58,8 @@ def update_graph(value):
         locationmode = "USA-states",
         locations = "state_po",
         scope = "usa",
-        color = "color",
+        color = "party_detailed",
+        color_discrete_map = {"REPUBLICAN": "red", "DEMOCRAT": "blue", "DEMOCRATIC-FARMER-LABOR": "green"},
         hover_data = ["state"],
         template = "plotly_dark"
     )
