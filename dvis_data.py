@@ -50,7 +50,6 @@ pres_states_winners = pres_states.copy()
 pres_states_winners.sort_values(["year","state_fips","candidatevotes"],ascending=False,inplace=True)
 pres_states_winners.drop_duplicates(["state_fips","year"],inplace=True)
 
-
 # Create dataframe, pres_county_winners, with most voted candidate per state per year
 pres_county_winners = pres_counties.copy()
 pres_county_winners.sort_values(["year","county_fips","candidatevotes"],ascending=False,inplace=True)

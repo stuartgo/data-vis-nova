@@ -11,7 +11,7 @@ from dash import html
 from dash.dependencies import Input, Output
 import json
 import dash_daq as daq
-from dvis_data import pres_states, pres_states_winners,pres_counties,counties,pres_county_winners
+from dvis_data import pres_states, pres_states_winners, pres_counties, counties, pres_county_winners
 ########
 
 # App layout
@@ -26,9 +26,12 @@ app.layout = html.Div([
         min = 2000, max = 2020, step = 4, value = 2020, # min, max, step, default of the slider
         id = "select_year", # unique id of the slider object
         marks = {
-            2000: {"label": "2000"}, 2004: {"label": "2004"},
-            2008: {"label": "2008"}, 2012: {"label": "2012"},
-            2016: {"label": "2016"}, 2020: {"label": "2020"}
+            2000: {"label": "2000", "style": {"color": "red"}},
+            2004: {"label": "2004", "style": {"color": "red"}},
+            2008: {"label": "2008", "style": {"color": "blue"}},
+            2012: {"label": "2012", "style": {"color": "blue"}},
+            2016: {"label": "2016", "style": {"color": "red"}},
+            2020: {"label": "2020", "style": {"color": "blue"}}
         },
         # vertical = 1 # uncomment to change slider to vertical orientation
     ),
@@ -38,7 +41,7 @@ app.layout = html.Div([
         label='State?',
         labelPosition='bottom'
     ),
-    html.Div(id = 'slider_output_container'),
+    # html.Div(id = 'slider_output_container'),
     html.Br(),
 
     dcc.Graph(id = "usa_map")
@@ -54,8 +57,6 @@ app.layout = html.Div([
 
 
 def update_graph(year, state):
-    # checking values and type
-
     # container = f"Results for the {value} elections"
 
     # filtering election data for current year
@@ -90,10 +91,6 @@ def update_graph(year, state):
             template = "plotly_dark"
         )
     return fig
-
-
-    
-
 
 
 if __name__ == "__main__":
