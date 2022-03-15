@@ -55,12 +55,10 @@ pres_county_winners = pres_counties.copy()
 pres_county_winners.sort_values(["year","county_fips","candidatevotes"],ascending=False,inplace=True)
 pres_county_winners.drop_duplicates(["county_fips","year"],inplace=True)
 
-#rename column
+# rename column
 pres_states_winners.rename(columns={"party_detailed":"party"},inplace=True)
 
-
-
-#Find the previous winner for each county
+# Find the previous winner for each county
 def previous_winner(row,state):
     if state:
         if row.name==len(pres_states_winners)-1:
@@ -85,7 +83,7 @@ pres_states_winners.sort_values(["state_fips","year"],ascending=[True,False],inp
 pres_states_winners.reset_index(inplace=True)
 pres_states_winners["prev_party"]=pres_states_winners.apply(lambda x: previous_winner(x,True) ,axis=1)
 
-
+# Determine swing states
 def swing(row):
     if (row.party == "REPUBLICAN") and (row.prev_party == "REPUBLICAN"):
         # red if winning party was republican for two elections in a row
@@ -105,7 +103,6 @@ def swing(row):
 
 pres_county_winners["swing"]=pres_county_winners.apply(lambda x: swing(x),axis=1)
 pres_states_winners["swing"]=pres_states_winners.apply(lambda x: swing(x),axis=1)
-
 
 #geojson is required when working with counties as its not built in
 with open('geojson_counties.json') as json_file:

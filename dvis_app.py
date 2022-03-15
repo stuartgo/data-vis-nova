@@ -75,7 +75,21 @@ def update_graph(year, state):
             scope = "usa",
             color = "party",
             color_discrete_map = {"REPUBLICAN": "red", "DEMOCRAT": "blue", "DEMOCRATIC-FARMER-LABOR": "green"},
-            hover_data = ["state"],
+            hover_name = "state",
+            hover_data = {
+                "index": False,
+                "year": False,
+                "state": False,
+                "state_po": False,
+                "state_fips": False,
+                "candidate": False,
+                "party": False,
+                "writein": False,
+                "candidatevotes": False,
+                "totalvotes": True,
+                "prev_party": False,
+                "swing": False
+            },
             # template = "plotly_dark"
         )
         fig.add_scattergeo(
