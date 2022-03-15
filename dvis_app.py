@@ -76,7 +76,7 @@ def update_graph(year, state):
             color = "party",
             color_discrete_map = {"REPUBLICAN": "red", "DEMOCRAT": "blue", "DEMOCRATIC-FARMER-LABOR": "green"},
             hover_data = ["state"],
-            template = "plotly_dark"
+            # template = "plotly_dark"
         )
         fig.add_scattergeo(
             locationmode = "USA-states",
@@ -96,11 +96,11 @@ def update_graph(year, state):
             color_discrete_map = {"REPUBLICAN": "red", "DEMOCRAT": "blue", "DEMOCRATIC-FARMER-LABOR": "green"},
             scope = "usa",
             hover_data = ["county_name","candidate"],
-            template = "plotly_dark"
+            # template = "plotly_dark"
         )
         fig.update_traces(marker_line_width = 0, marker_opacity = 0.8)
         fig.update_layout(margin = {"r": 0, "t": 0, "l": 0, "b": 0})
-        fig.update_geos(showsubunits = True, subunitcolor = "darkgray")
+        fig.update_geos(showsubunits = True, subunitcolor = "black")
     return fig
 
 
