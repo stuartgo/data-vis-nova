@@ -3,6 +3,7 @@
 
 #### Import libraries/modules ####
 import pandas as pd
+import numpy as np
 import json
 ########
 
@@ -27,7 +28,7 @@ def load_data():
 
 
     pres_states.drop(
-        columns = ["office", "version", "notes", "state_cen", "state_ic", "party_simplified"],
+        columns = ["office", "version", "notes", "state_cen", "state_ic", "party_detailed"],
         inplace = True
     )
     pres_counties.drop(
@@ -35,7 +36,7 @@ def load_data():
         inplace = True
     )
     senate.drop(
-        columns = ["state_cen", "state_ic", "district", "mode", "version", "party_simplified"],
+        columns = ["state_cen", "state_ic", "district", "mode", "version", "party_detailed"],
         inplace = True
     )
 
@@ -45,18 +46,19 @@ def load_data():
 pres_states, pres_counties, senate, info_counties = load_data()
 pres_states = pres_states[pres_states.year >= 1996]
 
+# Rename colum and rename the libertarian party as other
+pres_states.rename(columns = {"party_simplified": "party"}, inplace = True)
+pres_states.party.replace({"LIBERTARIAN": "OTHER"}, inplace = True)
+
 # Create dataframe, pres_states_winners, with most voted candidate per state per year
 pres_states_winners = pres_states.copy()
-pres_states_winners.sort_values(["year","state_fips","candidatevotes"],ascending=False,inplace=True)
-pres_states_winners.drop_duplicates(["state_fips","year"],inplace=True)
+pres_states_winners.sort_values(["year", "state_fips", "candidatevotes"],ascending=False,inplace=True)
+pres_states_winners.drop_duplicates(["state_fips", "year"],inplace=True)
 
 # Create dataframe, pres_county_winners, with most voted candidate per state per year
 pres_county_winners = pres_counties.copy()
-pres_county_winners.sort_values(["year","county_fips","candidatevotes"],ascending=False,inplace=True)
-pres_county_winners.drop_duplicates(["county_fips","year"],inplace=True)
-
-# rename column
-pres_states_winners.rename(columns={"party_detailed":"party"},inplace=True)
+pres_county_winners.sort_values(["year", "county_fips", "candidatevotes"],ascending=False,inplace=True)
+pres_county_winners.drop_duplicates(["county_fips", "year"],inplace=True)
 
 # Find the previous winner for each county
 def previous_winner(row,state):

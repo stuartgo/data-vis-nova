@@ -65,7 +65,7 @@ def update_graph(year, state):
     pres_county_winners_copy = pres_county_winners_copy[pres_county_winners_copy.year == year]
 
     # define colors for the parties
-    red, blue, light_blue = "#FF0000", "#0080FF", "#99CCFF"
+    red, blue, green = "#FF0000", "#0080FF", "#66CC00"
 
     # choropleth
     if state:
@@ -78,7 +78,7 @@ def update_graph(year, state):
             color_discrete_map = {
                 "REPUBLICAN": red,
                 "DEMOCRAT": blue,
-                "DEMOCRATIC-FARMER-LABOR": light_blue
+                "DEMOCRATIC-FARMER-LABOR": green
             },
             hover_name = "state",
             hover_data = {
@@ -108,7 +108,7 @@ def update_graph(year, state):
 
         # barplot with the number of votes per party
         fig_2 = px.bar(
-            data_frame = pres_states_winners[pres_states_winners.year == year],
+            data_frame = pres_states[pres_states.year == year],#.sort_values("candidatevotes", ascending = False),
             x = "party",
             y = "candidatevotes",
             hover_name = "party",
@@ -117,17 +117,22 @@ def update_graph(year, state):
             color_discrete_map = {
                 "REPUBLICAN": red,
                 "DEMOCRAT": blue,
-                "DEMOCRATIC-FARMER-LABOR": light_blue
+                "OTHER": green
             },
             labels = {
                 "party": "Party",
                 "candidatevotes": "Number of votes"
             },
             # title = "Number of votes per party",
-            range_y = [0, 60000000],
+            # range_y = [0, 60000000],
+            category_orders = {"party": ["DEMOCRAT", "REPUBLICAN", "OTHER"]},
             width = 800,
             height = 600,
             orientation = "v"
+        )
+        fig_2.update_layout(
+            # xaxis = {"categoryorder": "total descending"},
+            showlegend = False,
         )
         
     else:
@@ -139,7 +144,7 @@ def update_graph(year, state):
             color_discrete_map = {
                 "REPUBLICAN": red,
                 "DEMOCRAT": blue,
-                "DEMOCRATIC-FARMER-LABOR": light_blue
+                "DEMOCRATIC-FARMER-LABOR": green
             },
             scope = "usa",
             hover_data = ["county_name","candidate"],
