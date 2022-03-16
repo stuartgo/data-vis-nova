@@ -108,11 +108,11 @@ def update_graph(year, state):
 
         # barplot with the number of votes per party
         fig_2 = px.bar(
-            data_frame = pres_states_winners[pres_states_winners.year == year].groupby("party").sum().reset_index(),
+            data_frame = pres_states_winners[pres_states_winners.year == year],
             x = "party",
             y = "candidatevotes",
             hover_name = "party",
-            hover_data = ["candidatevotes"],
+            hover_data = ["candidatevotes", "state"],
             color = "party",
             color_discrete_map = {
                 "REPUBLICAN": red,
@@ -126,7 +126,8 @@ def update_graph(year, state):
             # title = "Number of votes per party",
             range_y = [0, 60000000],
             width = 800,
-            height = 600
+            height = 600,
+            orientation = "v"
         )
         
     else:
