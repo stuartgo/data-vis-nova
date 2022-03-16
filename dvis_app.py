@@ -58,12 +58,14 @@ app.layout = html.Div([
 def update_graph(year, state):
     # container = f"Results for the {value} elections"
 
-    # filtering election data for current year
+    # create copies of election data and filter election data for current year
     pres_states_winners_copy = pres_states_winners.copy()
     pres_states_winners_copy = pres_states_winners_copy[pres_states_winners_copy.year == year]
-
     pres_county_winners_copy = pres_county_winners.copy()
     pres_county_winners_copy = pres_county_winners_copy[pres_county_winners_copy.year == year]
+
+    # define colors for the parties
+    red, blue, light_blue = "#FF0000", "#0080FF", "#99CCFF"
 
     # choropleth
     if state:
@@ -73,7 +75,11 @@ def update_graph(year, state):
             locations = "state_po",
             scope = "usa",
             color = "party",
-            color_discrete_map = {"REPUBLICAN": "red", "DEMOCRAT": "blue", "DEMOCRATIC-FARMER-LABOR": "green"},
+            color_discrete_map = {
+                "REPUBLICAN": red,
+                "DEMOCRAT": blue,
+                "DEMOCRATIC-FARMER-LABOR": light_blue
+            },
             hover_name = "state",
             hover_data = {
                 "index": False,
@@ -104,7 +110,23 @@ def update_graph(year, state):
         fig_2 = px.bar(
             data_frame = pres_states_winners[pres_states_winners.year == year].groupby("party").sum().reset_index(),
             x = "party",
-            y = "candidatevotes"
+            y = "candidatevotes",
+            hover_name = "party",
+            hover_data = ["candidatevotes"],
+            color = "party",
+            color_discrete_map = {
+                "REPUBLICAN": red,
+                "DEMOCRAT": blue,
+                "DEMOCRATIC-FARMER-LABOR": light_blue
+            },
+            labels = {
+                "party": "Party",
+                "candidatevotes": "Number of votes"
+            },
+            # title = "Number of votes per party",
+            range_y = [0, 60000000],
+            width = 800,
+            height = 600
         )
         
     else:
@@ -113,7 +135,11 @@ def update_graph(year, state):
             geojson = counties,
             locations = "county_fips",
             color = "party",
-            color_discrete_map = {"REPUBLICAN": "red", "DEMOCRAT": "blue", "DEMOCRATIC-FARMER-LABOR": "green"},
+            color_discrete_map = {
+                "REPUBLICAN": red,
+                "DEMOCRAT": blue,
+                "DEMOCRATIC-FARMER-LABOR": light_blue
+            },
             scope = "usa",
             hover_data = ["county_name","candidate"],
             # template = "plotly_dark"
