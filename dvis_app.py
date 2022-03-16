@@ -44,18 +44,17 @@ app.layout = html.Div([
     # html.Div(id = 'slider_output_container'),
     html.Br(),
 
-    dcc.Graph(id = "usa_map")
+    dcc.Graph(id = "usa_map"),
+    dcc.Graph(id = "barplot_votes")
 ])
-
 
 
 @app.callback(
     Output(component_id = "usa_map", component_property = "figure"),
+    Output(component_id = "barplot_votes", component_property = "figure"),
     Input(component_id = "year_slider", component_property = "value"),
     Input(component_id = "state_county_toggle", component_property = "value")
 )
-
-
 def update_graph(year, state):
     # container = f"Results for the {value} elections"
 
@@ -68,7 +67,7 @@ def update_graph(year, state):
 
     # choropleth
     if state:
-        fig = px.choropleth(
+        fig_1 = px.choropleth(
             data_frame = pres_states_winners_copy,
             locationmode = "USA-states",
             locations = "state_po",
@@ -90,9 +89,8 @@ def update_graph(year, state):
                 "prev_party": False,
                 "swing": False
             },
-            # template = "plotly_dark"
         )
-        fig.add_scattergeo(
+        fig_1.add_scattergeo(
             locationmode = "USA-states",
             locations = pres_states_winners_copy["state_po"],
             text = pres_states_winners_copy["state_po"],
@@ -100,9 +98,17 @@ def update_graph(year, state):
             mode = "text",
             textfont = dict(family = "arial", size = 10)
         )
+        fig_1.update_layout(margin = dict(l = 0, r = 0, b = 0, t = 0, pad = 4, autoexpand = True))
+
+        # barplot with the number of votes per party
+        fig_2 = px.bar(
+            data_frame = pres_states_winners[pres_states_winners.year == year].groupby("party").sum().reset_index(),
+            x = "party",
+            y = "candidatevotes"
+        )
         
     else:
-        fig = px.choropleth(
+        fig_1 = px.choropleth(
             data_frame = pres_county_winners_copy,
             geojson = counties,
             locations = "county_fips",
@@ -112,10 +118,11 @@ def update_graph(year, state):
             hover_data = ["county_name","candidate"],
             # template = "plotly_dark"
         )
-        fig.update_traces(marker_line_width = 0, marker_opacity = 0.8)
-        fig.update_layout(margin = {"r": 0, "t": 0, "l": 0, "b": 0})
-        fig.update_geos(showsubunits = True, subunitcolor = "black")
-    return fig
+        fig_1.update_traces(marker_line_width = 0, marker_opacity = 0.8)
+        fig_1.update_layout(margin = dict(l = 0, r = 0, b = 0, t = 0, pad = 4, autoexpand = True))
+        fig_1.update_geos(showsubunits = True, subunitcolor = "black")
+
+    return (fig_1, fig_2)
 
 
 if __name__ == "__main__":
