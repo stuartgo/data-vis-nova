@@ -8,7 +8,7 @@ import pandas as pd
 import dash
 from dash import dcc
 from dash import html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import json
 import dash_daq as daq
 from dvis_data import pres_states, pres_states_winners, pres_counties, counties, pres_county_winners, usa_states
@@ -40,6 +40,12 @@ app.layout = html.Div([
         id = "all_or_none_button",
         n_clicks = 0
     ),
+    # dcc.Checklist(
+    #     id = "all_or_none_checklist",
+    #     options = [{"label": "Select All", "value": "All"}],
+    #     value = [],
+    #     labelStyle = {"display": "inline_block"}
+    # ),
     dcc.Checklist(
         id = "state_checklist",
         options = usa_states,
@@ -64,10 +70,10 @@ app.layout = html.Div([
     Output(component_id = "barplot_votes", component_property = "figure"),
     Input(component_id = "year_slider", component_property = "value"),
     Input(component_id = "state_checklist", component_property = "value"),
-    Input(component_id = "all_or_none_button",  component_property = "value"),
     Input(component_id = "state_county_toggle", component_property = "value")
 )
-def update_graph(year, states_selected, n_clicks, state_toggle):
+def update_graph(year, states_selected, state_toggle):
+
     # create copies of election data and filter election data for current year
     pres_states_copy = pres_states[pres_states["state"].isin(states_selected)].copy()
     pres_states_winners_copy = pres_states_winners[pres_states_winners["state"].isin(states_selected)].copy()
