@@ -35,13 +35,17 @@ app.layout = html.Div([
         },
         # vertical = 1 # uncomment to change slider to vertical orientation
     ),
-    daq.ToggleSwitch(
-        id='state_county_toggle',
-        value=True,
-        label='State?',
-        labelPosition='bottom'
+    dcc.Checklist(
+        id = "all_or_none_checklist",
+        options = [
+            {"label": "Select All", "value": "All"},
+            {"label": "Clear Selection", "value": "None"}
+        ],
+        value = [],
     ),
-    dcc.Checklist([
+    dcc.Checklist(
+        id = "state_checklist",
+        options = [
             "ALABAMA", "ALASKA", "ARIZONA","ARKANSAS", "CALIFORNIA", "COLORADO",
             "CONNECTICUT", "DELAWARE", "DISTRICT OF COLUMBIA", "FLORIDA", "GEORGIA",
             "HAWAII", "IDAHO", "ILLINOIS", "INDIANA", "IOWA", "KANSAS", "KENTUCKY",
@@ -53,8 +57,14 @@ app.layout = html.Div([
             "TENNESSEE", "TEXAS", "UTAH", "VERMONT", "VIRGINIA", "WASHINGTON",
             "WEST VIRGINIA", "WISCONSIN", "WYOMING"
         ],
-        ["WASHINGTON"]
+        value = ["WASHINGTON"],
     ),
+    daq.ToggleSwitch(
+        id='state_county_toggle',
+        value=True,
+        label='State?',
+        labelPosition='bottom'
+    ),    
     # html.Div(id = 'slider_output_container'),
     html.Br(),
 
@@ -67,13 +77,14 @@ app.layout = html.Div([
     Output(component_id = "usa_map", component_property = "figure"),
     Output(component_id = "barplot_votes", component_property = "figure"),
     Input(component_id = "year_slider", component_property = "value"),
+    Input(component_id = "state_checklist", component_property = "value"),
+    Input(component_id = "all_or_none_checklist",  component_property = "value"),
     Input(component_id = "state_county_toggle", component_property = "value")
 )
-def update_graph(year, state):
-    # container = f"Results for the {value} elections"
-
+def update_graph(year, states_selected, all_or_none, state_toggle):
     # create copies of election data and filter election data for current year
-    pres_states_winners_copy = pres_states_winners.copy()
+    pres_states_copy = pres_states[pres_states["state"].isin(states_selected)].copy()
+    pres_states_winners_copy = pres_states_winners[pres_states_winners["state"].isin(states_selected)].copy()
     pres_states_winners_copy = pres_states_winners_copy[pres_states_winners_copy.year == year]
     pres_county_winners_copy = pres_county_winners.copy()
     pres_county_winners_copy = pres_county_winners_copy[pres_county_winners_copy.year == year]
@@ -82,7 +93,7 @@ def update_graph(year, state):
     red, blue, green = "#FF0000", "#0080FF", "#66CC00"
 
     # choropleth
-    if state:
+    if state_toggle:
         fig_1 = px.choropleth(
             data_frame = pres_states_winners_copy,
             locationmode = "USA-states",
@@ -122,7 +133,7 @@ def update_graph(year, state):
 
         # barplot with the number of votes per party
         fig_2 = px.bar(
-            data_frame = pres_states[pres_states.year == year],#.sort_values("candidatevotes", ascending = False),
+            data_frame = pres_states_copy[pres_states.year == year],#.sort_values("candidatevotes", ascending = False),
             x = "party",
             y = "candidatevotes",
             hover_name = "party",
