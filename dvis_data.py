@@ -106,6 +106,20 @@ def swing(row):
 pres_county_winners["swing"]=pres_county_winners.apply(lambda x: swing(x),axis=1)
 pres_states_winners["swing"]=pres_states_winners.apply(lambda x: swing(x),axis=1)
 
+# list of USA states
+usa_states = [
+    "ALABAMA", "ALASKA", "ARIZONA","ARKANSAS", "CALIFORNIA", "COLORADO",
+    "CONNECTICUT", "DELAWARE", "DISTRICT OF COLUMBIA", "FLORIDA", "GEORGIA",
+    "HAWAII", "IDAHO", "ILLINOIS", "INDIANA", "IOWA", "KANSAS", "KENTUCKY",
+    "LOUISIANA", "MAINE", "MARYLAND", "MASSACHUSETTS", "MICHIGAN",
+    "MINNESOTA", "MISSISSIPPI", "MISSOURI", "MONTANA", "NEBRASKA",
+    "NEVADA", "NEW HAMPSHIRE", "NEW JERSEY", "NEW MEXICO", "NEW WORK",
+    "NORTH CAROLINA", "NORTH DAKOTA", "OHIO", "OKLAHOMA", "OREGON",
+    "PENNSYLVANIA", "RHODE ISLAND", "SOUTH CAROLINA", "SOUTH DAKOTA",
+    "TENNESSEE", "TEXAS", "UTAH", "VERMONT", "VIRGINIA", "WASHINGTON",
+    "WEST VIRGINIA", "WISCONSIN", "WYOMING"
+]
+
 #geojson is required when working with counties as its not built in
 with open('geojson_counties.json') as json_file:
     counties = json.load(json_file)
