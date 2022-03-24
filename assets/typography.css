@@ -1,0 +1,27 @@
+body{
+    margin:0
+}
+
+
+.Select-value{
+    background-color: #1f2630;
+    font-family: playfair display,sans-serif;
+    color: #7fafdf;
+}
+.Select-value-label{
+    color: #7fafdf !important;
+}
+
+.rc-slider-step{
+    background-color: #1f2630;
+}
+
+.rc-slider-track{
+    background-color: #7fafdf;
+}
+
+.rc-slider-handle{
+    background-color: #7fafdf;
+    width: 17px;
+    height: 17px;
+}
