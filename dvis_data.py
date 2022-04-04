@@ -49,11 +49,29 @@ pres_states = pres_states[pres_states.year >= 1996]
 # Rename colum and rename the libertarian party as other
 pres_states.rename(columns = {"party_simplified": "party"}, inplace = True)
 pres_states.party.replace({"LIBERTARIAN": "OTHER"}, inplace = True)
-
 # Create dataframe, pres_states_winners, with most voted candidate per state per year
 pres_states_winners = pres_states.copy()
 pres_states_winners.sort_values(["year", "state_fips", "candidatevotes"],ascending=False,inplace=True)
 pres_states_winners.drop_duplicates(["state_fips", "year"],inplace=True)
+
+
+senate.rename(columns = {"party_simplified": "party"}, inplace = True)
+senate=senate[senate.stage=="gen"]
+senate.party.replace({"LIBERTARIAN": "OTHER"}, inplace = True)
+senate_winners=senate.copy()
+senate_winners.reset_index(inplace=True)
+senate_winners.sort_values(["state_po","year","candidatevotes"],inplace=True,ascending=False)
+
+senate_seats=senate_winners.groupby(["state_po","year"]).head(2)
+senate_seats.reset_index(inplace=True)
+
+senate_seats=senate_seats.groupby(['state_po','year']).agg({'party': ' '.join}).reset_index(level=[0,1])
+
+senate_winners=senate_winners.merge(senate_seats,left_on=["year","state_po"],right_on=["year","state_po"])
+senate_winners.rename(columns={"party_x":"party","party_y":"seats"},inplace=True)
+print(":.....................................")
+print(senate_winners)
+
 
 # Create dataframe, pres_county_winners, with most voted candidate per state per year
 pres_county_winners = pres_counties.copy()
@@ -121,5 +139,6 @@ usa_states = [
 ]
 
 #geojson is required when working with counties as its not built in
-with open('geojson_counties.json') as json_file:
-    counties = json.load(json_file)
+# with open('geojson_counties.json') as json_file:
+#     counties = json.load(json_file)
+

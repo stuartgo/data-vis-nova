@@ -12,16 +12,22 @@ from dash import html
 from dash.dependencies import Input, Output, State
 import json
 import dash_daq as daq
-from dvis_data import pres_states, pres_states_winners, pres_counties, counties, pres_county_winners, usa_states
+from dvis_data import pres_states, pres_states_winners, pres_counties, pres_county_winners, usa_states,senate_winners,senate
 from skimage import io
 ########
 
 # App layout
-app = dash.Dash(__name__)
+
+external_scripts=[{
+    "src":"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js",
+    "ingegrity":"sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==",
+    "crossorigin":"anonymous"
+}]
+app = dash.Dash(__name__,external_scripts=external_scripts)
 background_color="#1f2630"
 box_color="#252e3f"
 font_color="#7fafdf"
-red, blue, green,grey = "#ef553b", "#636efa", "#66CC00","#f0f0f0"
+red, blue, green,grey,purple = "#ef553b", "#636efa", "#66CC00","#f0f0f0","#A9629B"
 graph=dcc.Loading(
     id="loading-1",
     children=[dcc.Graph(id = "usa_map",figure={"layout":{"plot_bgcolor":background_color}})],
@@ -37,16 +43,14 @@ store=dcc.Store(id='session', storage_type='session')
 slider=dcc.Slider(
                             min = 2000, max = 2020, step = 4, value = 2000, # min, max, step, default of the slider
                             id = "year_slider", # unique id of the slider object
-                            marks = {
-                                2000: {"label": "2000", "style": {"color": red,"font:family":"playfair display,sans-serif","font-size":"14px"}},
-                                2004: {"label": "2004", "style": {"color": red,"font:family":"playfair display,sans-serif","font-size":"14px"}},
-                                2008: {"label": "2008", "style": {"color": blue,"font:family":"playfair display,sans-serif","font-size":"14px"}},
-                                2012: {"label": "2012", "style": {"color": blue,"font:family":"playfair display,sans-serif","font-size":"14px"}},
-                                2016: {"label": "2016", "style": {"color": red,"font:family":"playfair display,sans-serif","font-size":"14px"}},
-                                2020: {"label": "2020", "style": {"color": blue,"font:family":"playfair display,sans-serif","font-size":"14px"}}
-                            },
-                            
-                            # vertical = 1 # uncomment to change slider to vertical orientation
+                            marks={
+                                2000: {"label": "2000", "style": {"color": red}},
+                                2004: {"label": "2004", "style": {"color": red}},
+                                2008: {"label": "2008", "style": {"color": blue}},
+                                2012: {"label": "2012", "style": {"color": blue}},
+                                2016: {"label": "2016", "style": {"color": red}},
+                                2020: {"label": "2020", "style": {"color": blue}}
+                            }
                         )
 #TODO: These bad boys need better names
 name_graph1="Number of votes by party by year"
@@ -57,7 +61,7 @@ app.layout = html.Div([
             store,
             html.Div([
                 html.H1(
-                        "Political Landscape of the USA in the 21st Century",
+                        "Political Landscape of the USA in the 21st Century", id="minge",
                         style = {"text-align": "left","font:family":"playfair display,sans-serif","color":font_color,"margin":0,"padding-top":"20px","padding-left":"20px"}
                         ),
                 html.P("Interactive web application to explore the results of the presidential elections in the 21st century",
@@ -65,58 +69,110 @@ app.layout = html.Div([
             ],style={}),
             html.Div([
                 html.Div([
-                        html.Div([slider],style={"background-color":box_color,"padding-top":"40px","margin-bottom":"20px"}),
-                        graph,
-                ],style={"width":"60%","padding-right":"20px"}),
+                        html.Div([
+                                html.Div([
+                                        slider,
+                                        html.Div([
+                                            html.Div(["Senate"],style={"display":"flex","justify-content":"center","align-content":"center","flex-direction":"column"}),
+                                            daq.ToggleSwitch( id="presidential_toggle",value=True),
+                                            html.Div(["Presidential"],style={"display":"flex","justify-content":"center","align-content":"center","flex-direction":"column"})
+                                        ],style={"display":"flex","flex-direction":"row","color":font_color,"justify-content":"center"})
+                                    ],style={"margin-bottom":"20px","background-color":box_color,"padding-top":"20px"}),
+                                graph,
+                                ])
+                    ],style={"width":"60%","padding-left":"20px","padding-right":"20px"}),
                 html.Div([
                     html.Div([dropdown],style={"margin":"20px"}),
                     graph2
-                ],style={"width":"40%","background-color":box_color})
+                ],style={"width":"40%","background-color":box_color,"margin-right":"20px"})
                 
             ],style={"display":"flex","flex-align":"row"}),
             html.Br(),
-        ],style={"background-color":background_color,"max-width":"100vw","max-height":"100vh","margin":0})
+        ],style={"background-color":background_color,"min-width":"100vw","min-height":"100vh"})
+
+
+
+@app.callback(
+    Output(component_id="year_slider",component_property="marks"),
+    Output(component_id="year_slider",component_property="min"),
+    Output(component_id="year_slider",component_property="max"),
+    Output(component_id="year_slider",component_property="step"),
+    Input(component_id = "presidential_toggle", component_property = "value"),
+)
+def presidential_toggle(presidential_toggle):
+    if presidential_toggle:
+         return {
+                                2000: {"label": "2000", "style": {"color": red}},
+                                2004: {"label": "2004", "style": {"color": red}},
+                                2008: {"label": "2008", "style": {"color": blue}},
+                                2012: {"label": "2012", "style": {"color": blue}},
+                                2016: {"label": "2016", "style": {"color": red}},
+                                2020: {"label": "2020", "style": {"color": blue}}
+                            },2000,2020,4
+
+        
+    else:
+        temp={}
+        for i in range(1976,2022,2):
+            temp[i]={"label":str(i)}
+        return temp,1976,2020,2
+
+
+
+
 @app.callback(
     Output("session","data"),
     Input(component_id = "usa_map", component_property = "clickData"),
+    Input(component_id = "presidential_toggle", component_property = "value"),
+    Input(component_id = "year_slider", component_property = "value"),
     State("session","data")
 )
-def on_click(clickdata,data):
-    data=data or {"states": ["WA"]}
+def on_click(clickdata,presidential,year,data):
+    ctx = dash.callback_context
+    print(clickdata)
+    #initialize or get session data
+    data=data or {"states": []}
+    #sets presidential boolean in session data
+    data["presidential"]=presidential
+    #when webapp starts there is no clickdata so this prevents an error
     if not clickdata:
         return data
+    #gets data on which state was clicked
     new_state=clickdata["points"][0]["location"]
-    if new_state in data["states"]:
-        data["states"].remove(new_state)
-    else:
-        data["states"].append(new_state)
-    print(data,"yeet")
+    #prevents state from being updated when clicking the presidential toggle
+    print(ctx.triggered)
+    if not ctx.triggered[0]["prop_id"]=="presidential_toggle.value":
+        #update the visbility of a state
+        if new_state in data["states"]:
+            data["states"].remove(new_state)
+        else:
+            data["states"].append(new_state)
+    #removes states from secondary graph that are not part of the senate elections
+    data["states"]=list(set(data["states"])- (set(senate.state_po.unique())-set(senate[senate.year==year].state_po.unique())))
     return data
 
 @app.callback(
     Output(component_id = "graph2", component_property = "figure"),
     Input(component_id = "year_slider", component_property = "value"),
     Input(component_id = "dropdown", component_property = "value"),
-    Input("session","data")
+    Input("session","data"),
+    Input(component_id = "presidential_toggle", component_property = "value")
 )
-def update_graph2(year,dropdown,data):
-    print(dropdown)
-    pres_states_copy = pres_states[pres_states["state_po"].isin(data["states"])].copy()
-    pres_states_winners_copy = pres_states_winners.copy() 
-    pres_states_winners_copy.party=pres_states_winners_copy.apply(lambda x: x.party if x.state_po in data["states"] else "None", axis=1)
-    pres_states_winners_copy_year=pres_states_winners_copy.copy()
-    pres_states_winners_copy = pres_states_winners_copy[pres_states_winners_copy.year == year]
-
-    pres_states_winners_copy_year=pres_states_winners_copy_year[pres_states_winners_copy_year["state_po"].isin(data["states"])].copy()
-
-    if dropdown==name_graph1:
+def update_graph2(year,dropdown,data,presidential):
+    print(data)
+    if presidential:
+        data_graph = pres_states[pres_states["state_po"].isin(data["states"])].copy()
+    else:
+        data_graph=senate[senate["state_po"].isin(data["states"])].copy()
+       
+    if dropdown==name_graph1: #This graph might not make sense when it plots all the years
         fig_2 = px.line(
-            pres_states_winners_copy_year.groupby(["party","year"]).sum().reset_index(level=[0,1]),
+            data_graph.groupby(["year","party"]).sum().reset_index(level=[0,1]),
             x="year",
-            y="totalvotes",
+            y="candidatevotes",
             color="party",
             labels = {
-            "totalvotes": "Number of votes",
+            "candidatevotes": "Number of votes",
             "year": "Year"
             },
             color_discrete_map = {
@@ -127,7 +183,7 @@ def update_graph2(year,dropdown,data):
             )
     elif dropdown==name_graph2:
         fig_2 = px.bar(
-        data_frame = pres_states_copy[pres_states.year == year],#.sort_values("candidatevotes", ascending = False),
+        data_frame = data_graph[data_graph.year == year],#.sort_values("candidatevotes", ascending = False),
         x = "party",
         y = "candidatevotes",
         hover_name = "party",
@@ -168,49 +224,68 @@ def update_graph2(year,dropdown,data):
 @app.callback(
     Output(component_id = "usa_map", component_property = "figure"),
     Input(component_id = "year_slider", component_property = "value"),
-    Input("session","data")
+    Input("session","data"),
+    Input(component_id = "presidential_toggle", component_property = "value")
 )
-def update_graph(year,data):
+def update_graph(year,data,presidential):
     # create copies of election data and filter election data for current year
-    pres_states_copy = pres_states[pres_states["state_po"].isin(data["states"])].copy()
-    pres_states_winners_copy = pres_states_winners.copy() #[pres_states_winners["state_po"].isin(data["states"])].copy()
-    pres_states_winners_copy.party=pres_states_winners_copy.apply(lambda x: x.party if x.state_po in data["states"] else "None", axis=1)
-    pres_states_winners_copy = pres_states_winners_copy[pres_states_winners_copy.year == year]
-
-    # define colors for the parties
-    
-    fig_1 = px.choropleth(
-        data_frame = pres_states_winners_copy,
-        locationmode = "USA-states",
-        locations = "state_po",
-        scope = "usa",
-        color = "party",
-        color_discrete_map = {
+    #pres_states_copy = pres_states[pres_states["state_po"].isin(data["states"])].copy()
+    if presidential:
+        pres_states_winners_copy = pres_states_winners.copy() #[pres_states_winners["state_po"].isin(data["states"])].copy()
+        pres_states_winners_copy.party=pres_states_winners_copy.apply(lambda x: x.party if x.state_po in data["states"] else "None", axis=1)
+        graph_data= pres_states_winners_copy[pres_states_winners_copy.year == year]
+        color_var="party"
+        color_map={
             "REPUBLICAN": red,
             "DEMOCRAT": blue,
             "DEMOCRATIC-FARMER-LABOR": green,
-            "None":grey
-        },
+            "None":grey,
+            "OTHER":green
+        }
+    else:
+        senate_winners_copy=senate_winners.copy()
+        senate_winners_copy.party=senate_winners_copy.apply(lambda x: x.party if x.state_po in data["states"] else "None", axis=1)
+        graph_data= senate_winners_copy[senate_winners_copy.year == year]
+        color_var="seats"
+        color_map={
+            "REPUBLICAN REPUBLICAN": red,
+            "DEMOCRAT DEMOCRAT":blue,
+            "DEMOCRAT REPUBLICAN": purple,
+            "REPUBLICAN DEMOCRAT":purple,
+            "OTHER OTHER": green
+        }
+        
+        
+    # define colors for the parties
+    
+    fig_1 = px.choropleth(
+        data_frame = graph_data,
+        locationmode = "USA-states",
+        locations = "state_po",
+        scope = "usa",
+        color = color_var,
+        color_discrete_map = color_map,
         hover_name = "state",
-        hover_data = {
-            "index": False,
-            "year": False,
-            "state": False,
-            "state_po": False,
-            "state_fips": False,
-            "candidate": False,
-            "party": False,
-            "writein": False,
-            "candidatevotes": False,
-            "totalvotes": True,
-            "prev_party": False,
-            "swing": False
-        },
+        hover_data = ["totalvotes"]
+        # {
+        #     "index": False,
+        #     "year": False,
+        #     "state": False,
+        #     "state_po": False,
+        #     "state_fips": False,
+        #     "candidate": False,
+        #     "party": False,
+        #     "writein": False,
+        #     "candidatevotes": False,
+        #     "totalvotes": True,
+        #     "prev_party": False,
+        #     "swing": False
+        # },
     )
     fig_1.add_scattergeo(
         locationmode = "USA-states",
-        locations = pres_states_winners_copy["state_po"],
-        text = pres_states_winners_copy["state_po"],
+        locations = graph_data["state_po"],
+        text = graph_data["state_po"],
         featureidkey = "properties.NAME_3",
         mode = "text",
         textfont = dict(family = "arial", size = 10),
@@ -224,7 +299,9 @@ def update_graph(year,data):
         legend_font_color=font_color,
         legend_title="Parties"
         )
-
+    for choropleth in fig_1["data"]:
+        if choropleth.name=="None":
+            choropleth.showlegend=False
     return fig_1
 
 
