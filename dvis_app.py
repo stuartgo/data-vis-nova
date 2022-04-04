@@ -5,6 +5,7 @@ from itertools import dropwhile
 from lib2to3.pygram import pattern_symbols
 import plotly.graph_objects as go
 import plotly.express as px
+from plotly.subplots import make_subplots
 import pandas as pd
 import dash
 from dash import dcc
@@ -12,7 +13,7 @@ from dash import html
 from dash.dependencies import Input, Output, State
 import json
 import dash_daq as daq
-from dvis_data import pres_states, pres_states_winners, pres_counties, pres_county_winners, usa_states,senate_winners,senate
+from dvis_data import pres_states, pres_states_winners, pres_counties, pres_county_winners, usa_states, senate_winners, senate, electoral_college, pres_bios
 from skimage import io
 ########
 
@@ -54,78 +55,107 @@ slider = dcc.Slider(
 )
 #TODO: These bad boys need better names
 name_graph1 = "Number of votes by party by year"
-name_graph2 = "Number of votes by party"
-name_graph3 = "NNNNNNEEEEEEEEh"
+name_graph2 = "Number of popular votes by party" 
+name_graph3 = "Number of electoral votes by party"
+name_graph4 = "NNNNNNEEEEEEEEh"
 dropdown = dcc.Dropdown(
-    [name_graph1, name_graph2, name_graph3],
+    [name_graph1, name_graph2, name_graph3, name_graph4],
     name_graph1,
     id = "dropdown",
     searchable = False
 )
 
 app.layout = html.Div([
-            store,
-            html.Div([
-                html.H1(
-                    "Political Landscape of the USA in the 21st Century",
-                    id = "minge",
-                    style = {
-                        "text-align": "left",
-                        "font:family": "playfair display,sans-serif",
-                        "color": font_color,
-                        "margin": 0,
-                        "padding-top": "20px",
-                        "padding-left": "20px"
-                    }
-                ),
-                html.P(
-                    "Interactive web application to explore the results of the presidential elections in the 21st century",
-                    style = {
-                        "text-align": "left",
-                        "font:family": "playfair display,sans-serif",
-                        "color": font_color,
-                        "padding":"20px"
-                    }
-                )
-            ], style={}),
+    store,
+    html.Div([
+        html.H1(
+            "Political Landscape of the USA in the 21st Century",
+            id = "minge",
+            style = {
+                "text-align": "left",
+                "font:family": "playfair display,sans-serif",
+                "color": font_color,
+                "margin": 0,
+                "padding-top": "20px",
+                "padding-left": "20px"
+            }
+        ),
+        html.P(
+            "Interactive web application to explore the results of the presidential elections in the 21st century",
+            style = {
+                "text-align": "left",
+                "font:family": "playfair display,sans-serif",
+                "color": font_color,
+                "padding":"20px"
+            }
+        )
+        ],
+        style={}
+    ),
+    html.Div([
+        html.Div([
             html.Div([
                 html.Div([
-                        html.Div([
-                                html.Div([
-                                        slider,
-                                        html.Div([
-                                            html.Div(
-                                                ["Senate"],
-                                                style = {
-                                                    "display": "flex",
-                                                    "justify-content": "center",
-                                                    "align-content": "center",
-                                                    "flex-direction": "column"
-                                                }
-                                            ),
-                                            daq.ToggleSwitch(id = "presidential_toggle", value = True),
-                                            html.Div(
-                                                ["Presidential"],
-                                                style = {
-                                                    "display": "flex",
-                                                    "justify-content": "center",
-                                                    "align-content": "center",
-                                                    "flex-direction": "column"
-                                                }
-                                            )
-                                        ], style = {"display": "flex", "flex-direction": "row", "color": font_color, "justify-content": "center"})
-                                    ],style = {"margin-bottom": "20px", "background-color": box_color, "padding-top": "20px"}),
-                                graph,
-                                ])
-                    ], style = {"width": "60%", "padding-left": "20px", "padding-right": "20px"}),
-                html.Div([
-                    html.Div([dropdown], style = {"margin": "20px"}),
-                    graph2
-                ], style = {"width": "40%", "background-color": box_color, "margin-right": "20px"})
-                
-            ], style = {"display": "flex", "flex-align": "row"}),
-            html.Br(),
-        ], style = {"background-color": background_color, "min-width": "100vw", "min-height": "100vh"})
+                    slider,
+                    html.Div([
+                        html.Div(
+                            ["Senate"],
+                            style = {
+                                "display": "flex",
+                                "justify-content": "center",
+                                "align-content": "center",
+                                "flex-direction": "column"
+                            }
+                        ),
+                        daq.ToggleSwitch(id = "presidential_toggle", value = True),
+                        html.Div(
+                            ["Presidential"],
+                            style = {
+                                "display": "flex",
+                                "justify-content": "center",
+                                "align-content": "center",
+                                "flex-direction": "column"
+                            }
+                        )
+                    ],
+                    style = {
+                        "display": "flex",
+                        "flex-direction": "row",
+                        "color": font_color,
+                        "justify-content": "center"
+                    })
+                ],
+                style = {
+                    "margin-bottom": "20px",
+                    "background-color": box_color,
+                    "padding-top": "20px"
+                }),
+                graph,
+            ])
+        ],
+        style = {
+            "width": "60%",
+            "padding-left": "20px",
+            "padding-right": "20px"
+        }),
+        html.Div([
+            html.Div([dropdown], style = {"margin": "20px"}),
+            graph2
+        ],
+        style = {
+            "width": "40%",
+            "background-color": box_color,
+            "margin-right": "20px"
+        })
+    ],
+    style = {
+        "display": "flex",
+        "flex-align": "row"
+    }),
+    html.Br(),
+],
+style = {"background-color": background_color, "min-width": "100vw", "min-height": "100vh"}
+)
 
 
 @app.callback(
@@ -189,13 +219,14 @@ def on_click(clickdata, presidential, year, data):
     Output(component_id = "graph2", component_property = "figure"),
     Input(component_id = "year_slider", component_property = "value"),
     Input(component_id = "dropdown", component_property = "value"),
-    Input("session","data"),
+    Input("session", "data"),
     Input(component_id = "presidential_toggle", component_property = "value")
 )
 def update_graph2(year, dropdown, data, presidential):
     print(data)
     if presidential:
         data_graph = pres_states[pres_states["state_po"].isin(data["states"])].copy()
+        electoral_college_copy = electoral_college[electoral_college["state_po"].isin(data["states"])].copy()
     else:
         data_graph=senate[senate["state_po"].isin(data["states"])].copy()
        
@@ -206,7 +237,7 @@ def update_graph2(year, dropdown, data, presidential):
             y="candidatevotes",
             color="party",
             labels = {
-            "candidatevotes": "Number of votes",
+            "candidatevotes": "Number of popular votes",
             "year": "Year"
             },
             color_discrete_map = {
@@ -217,35 +248,51 @@ def update_graph2(year, dropdown, data, presidential):
         )
     elif dropdown == name_graph2:
         fig_2 = px.bar(
-        data_frame = data_graph[data_graph.year == year],#.sort_values("candidatevotes", ascending = False),
-        x = "party",
-        y = "candidatevotes",
-        hover_name = "party",
-        hover_data = ["candidatevotes", "state"],
-        color = "party",
-        color_discrete_map = {
-            "REPUBLICAN": red,
-            "DEMOCRAT": blue,
-            "OTHER": green
-        },
-        labels = {
-            "party": "Party",
-            "candidatevotes": "Number of votes"
-        },
-        # title = "Number of votes per party",
-        # range_y = [0, 60000000],
-        category_orders = {"party": ["DEMOCRAT", "REPUBLICAN", "OTHER"]},
-        orientation = "v"
+            data_frame = data_graph[data_graph.year == year],#.sort_values("candidatevotes", ascending = False),
+            x = "party",
+            y = "candidatevotes",
+            hover_name = "party",
+            hover_data = ["candidatevotes", "state"],
+            color = "party",
+            color_discrete_map = {
+                "REPUBLICAN": red,
+                "DEMOCRAT": blue,
+                "OTHER": green
+            },
+            labels = {
+                "party": "Party",
+                "candidatevotes": "Number of popular votes"
+            },
+            category_orders = {"party": ["DEMOCRAT", "REPUBLICAN", "OTHER"]},
+            orientation = "v"
         )
     elif dropdown == name_graph3:
+        fig_2 = px.bar(
+            data_frame = electoral_college_copy[electoral_college_copy.Year == year],
+            x = "Party",
+            y = "Votes",
+            hover_name = "State",
+            hover_data = ["state_po", "Votes"],
+            color = "Party",
+            color_discrete_map = {
+                "REPUBLICAN": red,
+                "DEMOCRAT": blue
+            },
+            labels = {
+                "Party": "Party",
+                "Votes": "Number of electoral college votes"
+            }
+        )
+
+    elif dropdown == name_graph4:
         img = io.imread('https://www.frontlinegaming.org/wp-content/uploads/2020/11/s-l500.jpg')
         fig_2 = px.imshow(img)
     fig_2.update_layout(
         # xaxis = {"categoryorder": "total descending"},
         showlegend = False,
-        paper_bgcolor=box_color,
-        plot_bgcolor=box_color,
-        font_color=font_color
+        paper_bgcolor = box_color,
+        plot_bgcolor = box_color,
+        font_color = font_color
     )
     return fig_2
 
@@ -261,9 +308,9 @@ def update_graph(year, data, presidential):
     #pres_states_copy = pres_states[pres_states["state_po"].isin(data["states"])].copy()
     if presidential:
         pres_states_winners_copy = pres_states_winners.copy() #[pres_states_winners["state_po"].isin(data["states"])].copy()
-        pres_states_winners_copy.party=pres_states_winners_copy.apply(lambda x: x.party if x.state_po in data["states"] else "None", axis=1)
-        graph_data= pres_states_winners_copy[pres_states_winners_copy.year == year]
-        color_var="party"
+        pres_states_winners_copy.party = pres_states_winners_copy.apply(lambda x: x.party if x.state_po in data["states"] else "None", axis=1)
+        graph_data = pres_states_winners_copy[pres_states_winners_copy.year == year]
+        color_var = "party"
         color_map={
             "REPUBLICAN": red,
             "DEMOCRAT": blue,
@@ -332,6 +379,7 @@ def update_graph(year, data, presidential):
         if choropleth.name=="None":
             choropleth.showlegend=False
     return fig_1
+
 
 
 if __name__ == "__main__":

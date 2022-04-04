@@ -20,13 +20,16 @@ def load_data():
     pres_counties = pd.read_csv("countypres_2000-2020.csv") # county-level presidential elections
     senate = pd.read_csv("1976-2020-senate.csv", encoding = 'latin1') # senate elections
     info_counties = pd.read_csv("counties.csv") # county-level information, includes coordinates
+    electoral_college = pd.read_csv("electoral_college.csv") # electoral college votes per state
+    pres_bios = pd.read_excel("president_bios.xlsx") # information on party candidates since 2000
+    pres_bios.party = pres_bios.party.str.upper()
 
-        #fixes fips of counties
+    #fixes fips of counties
     pres_counties.dropna(inplace=True)
     pres_counties.county_fips=pres_counties.county_fips.astype(int)
     pres_counties.county_fips=pres_counties.county_fips.apply(lambda x: str("0"*int((5-len(str(x))))+str(x)) if len(str(x))<5 else str(x))
 
-
+    # drop unecessary columns
     pres_states.drop(
         columns = ["office", "version", "notes", "state_cen", "state_ic", "party_detailed"],
         inplace = True
@@ -39,11 +42,15 @@ def load_data():
         columns = ["state_cen", "state_ic", "district", "mode", "version", "party_detailed"],
         inplace = True
     )
+    electoral_college.drop(
+        columns = ["Unnamed: 4"],
+        inplace = True
+    )
 
-    return (pres_states, pres_counties, senate, info_counties)
+    return (pres_states, pres_counties, senate, info_counties, electoral_college, pres_bios)
 
 # Import data, drop unecessary columns and rows
-pres_states, pres_counties, senate, info_counties = load_data()
+pres_states, pres_counties, senate, info_counties, electoral_college, pres_bios = load_data()
 pres_states = pres_states[pres_states.year >= 1996]
 
 # Rename colum and rename the libertarian party as other
@@ -142,3 +149,17 @@ usa_states = [
 # with open('geojson_counties.json') as json_file:
 #     counties = json.load(json_file)
 
+
+## Preprocess Electoral College dataframe
+# map state to state_po
+state_po_df = pres_states.drop_duplicates("state")[["state", "state_po"]]
+state_po_map = {}
+
+for key, value in zip(state_po_df.state, state_po_df.state_po):
+    state_po_map[key.title()] = value
+
+electoral_college["state_po"] = electoral_college.State.map(state_po_map)
+
+# map Party to full party name
+college_party_map = {"R": "REPUBLICAN", "D": "DEMOCRAT"}
+electoral_college["Party"] = electoral_college.Party.map(college_party_map)
