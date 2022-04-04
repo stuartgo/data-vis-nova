@@ -17,128 +17,161 @@ from skimage import io
 ########
 
 # App layout
-
 external_scripts=[{
     "src":"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js",
     "ingegrity":"sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==",
     "crossorigin":"anonymous"
 }]
-app = dash.Dash(__name__,external_scripts=external_scripts)
-background_color="#1f2630"
-box_color="#252e3f"
-font_color="#7fafdf"
-red, blue, green,grey,purple = "#ef553b", "#636efa", "#66CC00","#f0f0f0","#A9629B"
-graph=dcc.Loading(
-    id="loading-1",
-    children=[dcc.Graph(id = "usa_map",figure={"layout":{"plot_bgcolor":background_color}})],
-    type="circle"
+app = dash.Dash(__name__, external_scripts=external_scripts)
+background_color = "#1f2630"
+box_color = "#252e3f"
+font_color = "#7fafdf"
+red, blue, green, grey, purple = "#ef553b", "#636efa", "#66CC00","#f0f0f0","#A9629B"
+graph = dcc.Loading(
+    id = "loading-1",
+    children = [dcc.Graph(id = "usa_map", figure = {"layout": {"plot_bgcolor": background_color}})],
+    type = "circle"
 )
-graph2=dcc.Loading(
-    id="loading-2",
-    children=[dcc.Graph(id = "graph2")],
-    type="circle"
+graph2 = dcc.Loading(
+    id = "loading-2",
+    children = [dcc.Graph(id = "graph2")],
+    type = "circle"
 )
 
-store=dcc.Store(id='session', storage_type='session')
-slider=dcc.Slider(
-                            min = 2000, max = 2020, step = 4, value = 2000, # min, max, step, default of the slider
-                            id = "year_slider", # unique id of the slider object
-                            marks={
-                                2000: {"label": "2000", "style": {"color": red}},
-                                2004: {"label": "2004", "style": {"color": red}},
-                                2008: {"label": "2008", "style": {"color": blue}},
-                                2012: {"label": "2012", "style": {"color": blue}},
-                                2016: {"label": "2016", "style": {"color": red}},
-                                2020: {"label": "2020", "style": {"color": blue}}
-                            }
-                        )
+store = dcc.Store(id = 'session', storage_type = 'session')
+# create a slider to select the year for which to retrieve election data
+slider = dcc.Slider(
+    min = 2000, max = 2020, step = 4, value = 2020, # min, max, step, default of the slider
+    id = "year_slider", # unique id of the slider object
+    marks = {
+        2000: {"label": "2000", "style": {"color": red}},
+        2004: {"label": "2004", "style": {"color": red}},
+        2008: {"label": "2008", "style": {"color": blue}},
+        2012: {"label": "2012", "style": {"color": blue}},
+        2016: {"label": "2016", "style": {"color": red}},
+        2020: {"label": "2020", "style": {"color": blue}}
+    }
+)
 #TODO: These bad boys need better names
-name_graph1="Number of votes by party by year"
-name_graph2="Number of votes by party"
-name_graph3="NNNNNNEEEEEEEEh"
-dropdown=dcc.Dropdown([name_graph1, name_graph2, name_graph3], name_graph1,id="dropdown", searchable=False)
+name_graph1 = "Number of votes by party by year"
+name_graph2 = "Number of votes by party"
+name_graph3 = "NNNNNNEEEEEEEEh"
+dropdown = dcc.Dropdown(
+    [name_graph1, name_graph2, name_graph3],
+    name_graph1,
+    id = "dropdown",
+    searchable = False
+)
+
 app.layout = html.Div([
             store,
             html.Div([
                 html.H1(
-                        "Political Landscape of the USA in the 21st Century", id="minge",
-                        style = {"text-align": "left","font:family":"playfair display,sans-serif","color":font_color,"margin":0,"padding-top":"20px","padding-left":"20px"}
-                        ),
-                html.P("Interactive web application to explore the results of the presidential elections in the 21st century",
-                style = {"text-align": "left","font:family":"playfair display,sans-serif","color":font_color,"padding":"20px"})
-            ],style={}),
+                    "Political Landscape of the USA in the 21st Century",
+                    id = "minge",
+                    style = {
+                        "text-align": "left",
+                        "font:family": "playfair display,sans-serif",
+                        "color": font_color,
+                        "margin": 0,
+                        "padding-top": "20px",
+                        "padding-left": "20px"
+                    }
+                ),
+                html.P(
+                    "Interactive web application to explore the results of the presidential elections in the 21st century",
+                    style = {
+                        "text-align": "left",
+                        "font:family": "playfair display,sans-serif",
+                        "color": font_color,
+                        "padding":"20px"
+                    }
+                )
+            ], style={}),
             html.Div([
                 html.Div([
                         html.Div([
                                 html.Div([
                                         slider,
                                         html.Div([
-                                            html.Div(["Senate"],style={"display":"flex","justify-content":"center","align-content":"center","flex-direction":"column"}),
-                                            daq.ToggleSwitch( id="presidential_toggle",value=True),
-                                            html.Div(["Presidential"],style={"display":"flex","justify-content":"center","align-content":"center","flex-direction":"column"})
-                                        ],style={"display":"flex","flex-direction":"row","color":font_color,"justify-content":"center"})
-                                    ],style={"margin-bottom":"20px","background-color":box_color,"padding-top":"20px"}),
+                                            html.Div(
+                                                ["Senate"],
+                                                style = {
+                                                    "display": "flex",
+                                                    "justify-content": "center",
+                                                    "align-content": "center",
+                                                    "flex-direction": "column"
+                                                }
+                                            ),
+                                            daq.ToggleSwitch(id = "presidential_toggle", value = True),
+                                            html.Div(
+                                                ["Presidential"],
+                                                style = {
+                                                    "display": "flex",
+                                                    "justify-content": "center",
+                                                    "align-content": "center",
+                                                    "flex-direction": "column"
+                                                }
+                                            )
+                                        ], style = {"display": "flex", "flex-direction": "row", "color": font_color, "justify-content": "center"})
+                                    ],style = {"margin-bottom": "20px", "background-color": box_color, "padding-top": "20px"}),
                                 graph,
                                 ])
-                    ],style={"width":"60%","padding-left":"20px","padding-right":"20px"}),
+                    ], style = {"width": "60%", "padding-left": "20px", "padding-right": "20px"}),
                 html.Div([
-                    html.Div([dropdown],style={"margin":"20px"}),
+                    html.Div([dropdown], style = {"margin": "20px"}),
                     graph2
-                ],style={"width":"40%","background-color":box_color,"margin-right":"20px"})
+                ], style = {"width": "40%", "background-color": box_color, "margin-right": "20px"})
                 
-            ],style={"display":"flex","flex-align":"row"}),
+            ], style = {"display": "flex", "flex-align": "row"}),
             html.Br(),
-        ],style={"background-color":background_color,"min-width":"100vw","min-height":"100vh"})
-
+        ], style = {"background-color": background_color, "min-width": "100vw", "min-height": "100vh"})
 
 
 @app.callback(
-    Output(component_id="year_slider",component_property="marks"),
-    Output(component_id="year_slider",component_property="min"),
-    Output(component_id="year_slider",component_property="max"),
-    Output(component_id="year_slider",component_property="step"),
+    Output(component_id = "year_slider",component_property="marks"),
+    Output(component_id = "year_slider",component_property="min"),
+    Output(component_id = "year_slider",component_property="max"),
+    Output(component_id = "year_slider",component_property="step"),
     Input(component_id = "presidential_toggle", component_property = "value"),
 )
 def presidential_toggle(presidential_toggle):
     if presidential_toggle:
          return {
-                                2000: {"label": "2000", "style": {"color": red}},
-                                2004: {"label": "2004", "style": {"color": red}},
-                                2008: {"label": "2008", "style": {"color": blue}},
-                                2012: {"label": "2012", "style": {"color": blue}},
-                                2016: {"label": "2016", "style": {"color": red}},
-                                2020: {"label": "2020", "style": {"color": blue}}
-                            },2000,2020,4
-
+            2000: {"label": "2000", "style": {"color": red}},
+            2004: {"label": "2004", "style": {"color": red}},
+            2008: {"label": "2008", "style": {"color": blue}},
+            2012: {"label": "2012", "style": {"color": blue}},
+            2016: {"label": "2016", "style": {"color": red}},
+            2020: {"label": "2020", "style": {"color": blue}}
+        },2000,2020,4
         
     else:
-        temp={}
-        for i in range(1976,2022,2):
-            temp[i]={"label":str(i)}
-        return temp,1976,2020,2
-
-
+        temp = {}
+        for i in range(1976, 2022, 2):
+            temp[i] = {"label": str(i)}
+        return temp, 1976, 2020, 2
 
 
 @app.callback(
-    Output("session","data"),
+    Output("session", "data"),
     Input(component_id = "usa_map", component_property = "clickData"),
     Input(component_id = "presidential_toggle", component_property = "value"),
     Input(component_id = "year_slider", component_property = "value"),
     State("session","data")
 )
-def on_click(clickdata,presidential,year,data):
+def on_click(clickdata, presidential, year, data):
     ctx = dash.callback_context
     print(clickdata)
     #initialize or get session data
-    data=data or {"states": []}
+    data = data or {"states": []}
     #sets presidential boolean in session data
-    data["presidential"]=presidential
+    data["presidential"] = presidential
     #when webapp starts there is no clickdata so this prevents an error
     if not clickdata:
         return data
     #gets data on which state was clicked
-    new_state=clickdata["points"][0]["location"]
+    new_state = clickdata["points"][0]["location"]
     #prevents state from being updated when clicking the presidential toggle
     print(ctx.triggered)
     if not ctx.triggered[0]["prop_id"]=="presidential_toggle.value":
@@ -148,8 +181,9 @@ def on_click(clickdata,presidential,year,data):
         else:
             data["states"].append(new_state)
     #removes states from secondary graph that are not part of the senate elections
-    data["states"]=list(set(data["states"])- (set(senate.state_po.unique())-set(senate[senate.year==year].state_po.unique())))
+    data["states"] = list(set(data["states"])-(set(senate.state_po.unique())-set(senate[senate.year==year].state_po.unique())))
     return data
+
 
 @app.callback(
     Output(component_id = "graph2", component_property = "figure"),
@@ -158,14 +192,14 @@ def on_click(clickdata,presidential,year,data):
     Input("session","data"),
     Input(component_id = "presidential_toggle", component_property = "value")
 )
-def update_graph2(year,dropdown,data,presidential):
+def update_graph2(year, dropdown, data, presidential):
     print(data)
     if presidential:
         data_graph = pres_states[pres_states["state_po"].isin(data["states"])].copy()
     else:
         data_graph=senate[senate["state_po"].isin(data["states"])].copy()
        
-    if dropdown==name_graph1: #This graph might not make sense when it plots all the years
+    if dropdown == name_graph1: #This graph might not make sense when it plots all the years
         fig_2 = px.line(
             data_graph.groupby(["year","party"]).sum().reset_index(level=[0,1]),
             x="year",
@@ -180,8 +214,8 @@ def update_graph2(year,dropdown,data,presidential):
             "DEMOCRAT": blue,
             "OTHER": green
             }
-            )
-    elif dropdown==name_graph2:
+        )
+    elif dropdown == name_graph2:
         fig_2 = px.bar(
         data_frame = data_graph[data_graph.year == year],#.sort_values("candidatevotes", ascending = False),
         x = "party",
@@ -203,7 +237,7 @@ def update_graph2(year,dropdown,data,presidential):
         category_orders = {"party": ["DEMOCRAT", "REPUBLICAN", "OTHER"]},
         orientation = "v"
         )
-    elif dropdown==name_graph3:
+    elif dropdown == name_graph3:
         img = io.imread('https://www.frontlinegaming.org/wp-content/uploads/2020/11/s-l500.jpg')
         fig_2 = px.imshow(img)
     fig_2.update_layout(
@@ -216,18 +250,13 @@ def update_graph2(year,dropdown,data,presidential):
     return fig_2
 
 
-
-
-
-
-
 @app.callback(
     Output(component_id = "usa_map", component_property = "figure"),
     Input(component_id = "year_slider", component_property = "value"),
-    Input("session","data"),
+    Input("session", "data"),
     Input(component_id = "presidential_toggle", component_property = "value")
 )
-def update_graph(year,data,presidential):
+def update_graph(year, data, presidential):
     # create copies of election data and filter election data for current year
     #pres_states_copy = pres_states[pres_states["state_po"].isin(data["states"])].copy()
     if presidential:
@@ -240,7 +269,7 @@ def update_graph(year,data,presidential):
             "DEMOCRAT": blue,
             "DEMOCRATIC-FARMER-LABOR": green,
             "None":grey,
-            "OTHER":green
+            "OTHER": green
         }
     else:
         senate_winners_copy=senate_winners.copy()
