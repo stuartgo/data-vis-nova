@@ -75,7 +75,7 @@ app.layout = html.Div([
     store,
     html.Div([
         html.H1(
-            "Political Landscape of the USA in the 21st Century",
+            "Political Landscape of the United States of America",
             id = "minge",
             style = {
                 "text-align": "left",
@@ -87,7 +87,7 @@ app.layout = html.Div([
             }
         ),
         html.P(
-            "Interactive web application to explore the results of the presidential elections in the 21st century",
+            "Interactive web application to explore the results and trends of political elections in the US",
             style = {
                 "text-align": "left",
                 "font:family": "playfair display,sans-serif",
