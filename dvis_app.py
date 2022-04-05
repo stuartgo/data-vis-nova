@@ -291,7 +291,7 @@ def update_graph3(year_range):
         y = rep_votes/(dem_votes+rep_votes)*100
     )
     fig_3.update_layout(
-        # title = "Party victories per state since 1900",
+        # title = "Party victories per state",
         xaxis_title = "State",
         yaxis_title = "Victories, %",
         hovermode = "x",
