@@ -233,8 +233,8 @@ def on_click(clickdata, presidential, year, data):
 def update_graph3(presidential):
     if presidential:
         fig_3 = go.Figure()
-        fig_3.add_bar(x = state_party_win_count.State.unique(), y = state_party_win_count.loc[state_party_win_count.Party == "DEMOCRAT", "Votes"])
-        fig_3.add_bar(x = state_party_win_count.State.unique(), y = state_party_win_count.loc[state_party_win_count.Party == "REPUBLICAN", "Votes"])
+        fig_3.add_bar(x = state_party_win_count.State.unique(), y = state_party_win_count.loc[state_party_win_count.Party == "DEMOCRAT", "vote_pc"])
+        fig_3.add_bar(x = state_party_win_count.State.unique(), y = state_party_win_count.loc[state_party_win_count.Party == "REPUBLICAN", "vote_pc"])
         fig_3.update_layout(barmode = "relative")
 
     return fig_3
