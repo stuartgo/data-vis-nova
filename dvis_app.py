@@ -14,6 +14,7 @@ import json
 import dash_daq as daq
 from dvis_data import pres_states, pres_states_winners, pres_counties, pres_county_winners, usa_states,senate_winners,senate
 from skimage import io
+from senateGraph import senate_graph
 ########
 
 # App layout
@@ -146,9 +147,11 @@ def on_click(clickdata,presidential,year,data):
         if new_state in data["states"]:
             data["states"].remove(new_state)
         else:
+            print("yeeeeeeeeeeeeeeeeeeeeeet added")
             data["states"].append(new_state)
     #removes states from secondary graph that are not part of the senate elections
-    data["states"]=list(set(data["states"])- (set(senate.state_po.unique())-set(senate[senate.year==year].state_po.unique())))
+    if not presidential:
+        data["states"]=list(set(data["states"])- (set(senate.state_po.unique())-set(senate[senate.year==year].state_po.unique())))
     return data
 
 @app.callback(
@@ -204,15 +207,15 @@ def update_graph2(year,dropdown,data,presidential):
         orientation = "v"
         )
     elif dropdown==name_graph3:
-        img = io.imread('https://www.frontlinegaming.org/wp-content/uploads/2020/11/s-l500.jpg')
-        fig_2 = px.imshow(img)
-    fig_2.update_layout(
-        # xaxis = {"categoryorder": "total descending"},
-        showlegend = False,
-        paper_bgcolor=box_color,
-        plot_bgcolor=box_color,
-        font_color=font_color
-    )
+        fig_2=senate_graph(year,senate_winners,{
+            "REPUBLICAN": red,
+            "DEMOCRAT": blue,
+            "OTHER": green
+        })
+        fig_2.update_layout(
+            legend_font_color=font_color,
+            legend_title="Parties"
+        )
     return fig_2
 
 
