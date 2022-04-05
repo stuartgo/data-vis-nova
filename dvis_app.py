@@ -37,7 +37,7 @@ graph = dcc.Loading(
 )
 graph2 = dcc.Loading(
     id = "loading-2",
-    children = [dcc.Graph(id = "graph2")],
+    children = [dcc.Graph(id = "graph2", figure = {"layout": {"plot_bgcolor": background_color}})],
     type = "circle"
 )
 graph3 = dcc.Loading(
@@ -159,14 +159,33 @@ app.layout = html.Div([
         "flex-align": "row"
     }),
     html.Div([
+        html.H2(
+            "Mirror, mirror on the wall... who is the bluest of them all?",
+            id = "graph3-title",
+            style = {
+                "text-align": "left",
+                "color": font_color,
+                "font:family": "playfair display,sans-serif",
+                "padding-top": "20px",
+                "padding-left": "20px"
+            }
+        ),
+        html.P(
+            "Since 1900 there have been 31 elections. How often has each party won in each state since then?",
+            style = {
+                "text-align": "left",
+                "color": font_color,
+                "font:family": "playfair display,sans-serif",
+                "padding-left": "20px"
+            }
+        ),
         graph3
     ],
     style = {
         "padding-left": "20px",
         "padding-right": "20px",
         "background-color": box_color
-    }
-    ),
+    }),
     html.Br(),
 ],
 style = {"background-color": background_color, "min-width": "100vw", "min-height": "100vh"}
@@ -248,13 +267,17 @@ def update_graph3(presidential):
             y = state_party_win_count["Rep_pc"]
         )
         fig_3.update_layout(
+            # title = "Party victories per state since 1900",
+            xaxis_title = "State",
+            yaxis_title = "Victories, %",
+            hovermode = "x",
             barmode = "relative"
         )
         fig_3.add_hline(
             y = 50,
             line_width = 2,
             line_dash = "dash",
-            line_color = grey
+            line_color = "black",
         )
 
     return fig_3

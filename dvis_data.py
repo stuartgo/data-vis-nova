@@ -195,3 +195,5 @@ state_party_win_count = pd.DataFrame({
     "Rep_votes": state_rep_win_count.Votes,
     "Rep_pc": state_rep_win_count.vote_pc
 }).sort_values("Dem_pc", ascending = False)
+
+print(len(electoral_college[electoral_college.Year >= 1900].Year.unique()))
