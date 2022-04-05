@@ -250,6 +250,12 @@ def update_graph3(presidential):
         fig_3.update_layout(
             barmode = "relative"
         )
+        fig_3.add_hline(
+            y = 50,
+            line_width = 2,
+            line_dash = "dash",
+            line_color = grey
+        )
 
     return fig_3
 
