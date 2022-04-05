@@ -160,7 +160,13 @@ app.layout = html.Div([
     }),
     html.Div([
         graph3
-    ]),
+    ],
+    style = {
+        "padding-left": "20px",
+        "padding-right": "20px",
+        "background-color": box_color
+    }
+    ),
     html.Br(),
 ],
 style = {"background-color": background_color, "min-width": "100vw", "min-height": "100vh"}
@@ -233,9 +239,17 @@ def on_click(clickdata, presidential, year, data):
 def update_graph3(presidential):
     if presidential:
         fig_3 = go.Figure()
-        fig_3.add_bar(x = state_party_win_count.State.unique(), y = state_party_win_count.loc[state_party_win_count.Party == "DEMOCRAT", "vote_pc"])
-        fig_3.add_bar(x = state_party_win_count.State.unique(), y = state_party_win_count.loc[state_party_win_count.Party == "REPUBLICAN", "vote_pc"])
-        fig_3.update_layout(barmode = "relative")
+        fig_3.add_bar(
+            x = state_party_win_count.State.unique(),
+            y = state_party_win_count["Dem_pc"]
+        )
+        fig_3.add_bar(
+            x = state_party_win_count.State.unique(),
+            y = state_party_win_count["Rep_pc"]
+        )
+        fig_3.update_layout(
+            barmode = "relative"
+        )
 
     return fig_3
 

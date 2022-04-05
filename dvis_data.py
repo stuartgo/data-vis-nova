@@ -177,9 +177,21 @@ state_party_win_count = pd.concat([state_party_win_count, dc_republican], ignore
 state_party_win_count["vote_pc"] = pd.Series()
 
 # calculate % of votes per party per state
+# TODO: very convoluted code, needs revision
 for state in state_party_win_count.State.unique():
     total_votes = state_party_win_count[state_party_win_count.State == state].Votes.sum()
 
     for party in state_party_win_count.loc[(state_party_win_count.State == state), "Party"]:
         party_vote_pc = round(state_party_win_count.loc[(state_party_win_count.State == state) & (state_party_win_count.Party == party), "Votes"]/total_votes * 100, 0)
         state_party_win_count.loc[(state_party_win_count.State == state) & (state_party_win_count.Party == party), "vote_pc"] = party_vote_pc
+
+state_dem_win_count = state_party_win_count[state_party_win_count.Party == "DEMOCRAT"].reset_index(drop = True)
+state_rep_win_count = state_party_win_count[state_party_win_count.Party == "REPUBLICAN"].reset_index(drop = True)
+
+state_party_win_count = pd.DataFrame({
+    "State": state_dem_win_count.State,
+    "Dem_votes": state_dem_win_count.Votes,
+    "Dem_pc": state_dem_win_count.vote_pc,
+    "Rep_votes": state_rep_win_count.Votes,
+    "Rep_pc": state_rep_win_count.vote_pc
+}).sort_values("Dem_pc", ascending = False)
