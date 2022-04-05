@@ -14,7 +14,7 @@ from dash import html
 from dash.dependencies import Input, Output, State
 import json
 import dash_daq as daq
-from dvis_data import pres_states, pres_states_winners, pres_counties, pres_county_winners, usa_states, senate_winners, senate, electoral_college, state_party_win_count, pres_bios
+from dvis_data import pres_states, pres_states_winners, pres_counties, pres_county_winners, usa_states, senate_winners, senate, electoral_college, pres_bios
 from skimage import io
 from senateGraph import senate_graph
 ########
@@ -87,7 +87,8 @@ app.layout = html.Div([
             }
         ),
         html.P(
-            "Interactive web application to explore the results and trends of political elections in the US",
+            "This interactive web application was created to allow for the exploration of the political results and trends in the US. " +
+            "Select any of the states you would like to know more about and have fun exploring.",
             style = {
                 "text-align": "left",
                 "font:family": "playfair display,sans-serif",
@@ -160,7 +161,7 @@ app.layout = html.Div([
     }),
     html.Div([
         html.H2(
-            "Mirror, mirror on the wall... who is the bluest of them all?",
+            "Mirror, mirror on the wall... who's the bluest of them all?",
             id = "graph3-title",
             style = {
                 "text-align": "left",
@@ -171,7 +172,7 @@ app.layout = html.Div([
             }
         ),
         html.P(
-            "Since 1900 there have been 31 elections. How often has each party won in each state since then?",
+            "There have been 31 elections since 1900. How often has each party won in each state?",
             style = {
                 "text-align": "left",
                 "color": font_color,
@@ -179,6 +180,15 @@ app.layout = html.Div([
                 "padding-left": "20px"
             }
         ),
+        html.Div([
+            dcc.RangeSlider(
+                1900,
+                2020,
+                4,
+                value = [1900, 2020],
+                id = "range-slider"
+            ),
+        ]),
         graph3
     ],
     style = {
@@ -253,32 +263,46 @@ def on_click(clickdata, presidential, year, data):
 
 @app.callback(
     Output(component_id = "graph3", component_property = "figure"),
-    Input(component_id = "presidential_toggle", component_property = "value")
+    Input(component_id = "range-slider", component_property = "value")
 )
-def update_graph3(presidential):
-    if presidential:
-        fig_3 = go.Figure()
-        fig_3.add_bar(
-            x = state_party_win_count.State.unique(),
-            y = state_party_win_count["Dem_pc"]
-        )
-        fig_3.add_bar(
-            x = state_party_win_count.State.unique(),
-            y = state_party_win_count["Rep_pc"]
-        )
-        fig_3.update_layout(
-            # title = "Party victories per state since 1900",
-            xaxis_title = "State",
-            yaxis_title = "Victories, %",
-            hovermode = "x",
-            barmode = "relative"
-        )
-        fig_3.add_hline(
-            y = 50,
-            line_width = 2,
-            line_dash = "dash",
-            line_color = "black",
-        )
+def update_graph3(year_range):
+    # filters dataframe according to the year range selected in the slider
+    min_year, max_year = year_range[0], year_range[1]
+    electoral_college_copy = electoral_college[(electoral_college.Year >= min_year) & (electoral_college.Year <= max_year)]
+    electoral_college_copy = electoral_college_copy.groupby(["State", "Party"])["Votes"].count().reset_index()
+    # adds a republican count of 0 to D.C. (otherwise nothing is shown because Republicans have never won D.C.)
+    dc_republican = pd.DataFrame({
+        "State": ["D.C."],
+        "Party": ["REPUBLICAN"],
+        "Votes": [0]
+    })
+    electoral_college_copy = pd.concat([electoral_college_copy, dc_republican], ignore_index = True, axis = 0).sort_values(["State", "Party"])
+    # determine number of democrat and republican votes
+    dem_votes = electoral_college_copy.loc[electoral_college_copy.Party == "DEMOCRAT", :].set_index("State")["Votes"]
+    rep_votes = electoral_college_copy.loc[electoral_college_copy.Party == "REPUBLICAN", :].set_index("State")["Votes"]
+    
+    fig_3 = go.Figure()
+    fig_3.add_bar(
+        x = electoral_college_copy.State.unique(),
+        y = dem_votes/(dem_votes+rep_votes)*100
+    )
+    fig_3.add_bar(
+        x = electoral_college_copy.State.unique(),
+        y = rep_votes/(dem_votes+rep_votes)*100
+    )
+    fig_3.update_layout(
+        # title = "Party victories per state since 1900",
+        xaxis_title = "State",
+        yaxis_title = "Victories, %",
+        hovermode = "x",
+        barmode = "stack"
+    )
+    fig_3.add_hline(
+        y = 50,
+        line_width = 2,
+        line_dash = "dash",
+        line_color = "black",
+    )
 
     return fig_3
 

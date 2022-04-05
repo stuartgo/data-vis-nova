@@ -164,34 +164,41 @@ electoral_college["state_po"] = electoral_college.State.map(state_po_map)
 college_party_map = {"R": "REPUBLICAN", "D": "DEMOCRAT"}
 electoral_college["Party"] = electoral_college.Party.map(college_party_map)
 
-# determine number of times each state voted for each party (electoral college votes)
-state_party_win_count = electoral_college[electoral_college.Year >= 1900].groupby(["State", "Party"])["Votes"].count()
-state_party_win_count = state_party_win_count.reset_index()
-# add republican 0 count for D.C.
+# # determine number of times each state voted for each party (electoral college votes)
+# state_party_win_count = electoral_college[electoral_college.Year >= 1900].groupby(["State", "Party"])["Votes"].count()
+# state_party_win_count = state_party_win_count.reset_index()
+
+# state_party_win_count = pd.concat([state_party_win_count, dc_republican], ignore_index = True, axis = 0).sort_values(["State", "Party"])
+# state_party_win_count["vote_pc"] = pd.Series()
+
+# # calculate % of votes per party per state
+# # TODO: very convoluted code, needs revision
+# for state in state_party_win_count.State.unique():
+#     total_votes = state_party_win_count[state_party_win_count.State == state].Votes.sum()
+
+#     for party in state_party_win_count.loc[(state_party_win_count.State == state), "Party"]:
+#         party_vote_pc = round(state_party_win_count.loc[(state_party_win_count.State == state) & (state_party_win_count.Party == party), "Votes"]/total_votes * 100, 0)
+#         state_party_win_count.loc[(state_party_win_count.State == state) & (state_party_win_count.Party == party), "vote_pc"] = party_vote_pc
+
+# state_dem_win_count = state_party_win_count[state_party_win_count.Party == "DEMOCRAT"].reset_index(drop = True)
+# state_rep_win_count = state_party_win_count[state_party_win_count.Party == "REPUBLICAN"].reset_index(drop = True)
+# state_party_win_count = pd.DataFrame({
+#     "State": state_dem_win_count.State,
+#     "Dem_votes": state_dem_win_count.Votes,
+#     "Dem_pc": state_dem_win_count.vote_pc,
+#     "Rep_votes": state_rep_win_count.Votes,
+#     "Rep_pc": state_rep_win_count.vote_pc
+# }).sort_values("Dem_pc", ascending = False)
+
+####
 dc_republican = pd.DataFrame({
     "State": ["D.C."],
     "Party": ["REPUBLICAN"],
     "Votes": [0]
 })
-state_party_win_count = pd.concat([state_party_win_count, dc_republican], ignore_index = True, axis = 0).sort_values(["State", "Party"])
-state_party_win_count["vote_pc"] = pd.Series()
 
-# calculate % of votes per party per state
-# TODO: very convoluted code, needs revision
-for state in state_party_win_count.State.unique():
-    total_votes = state_party_win_count[state_party_win_count.State == state].Votes.sum()
-
-    for party in state_party_win_count.loc[(state_party_win_count.State == state), "Party"]:
-        party_vote_pc = round(state_party_win_count.loc[(state_party_win_count.State == state) & (state_party_win_count.Party == party), "Votes"]/total_votes * 100, 0)
-        state_party_win_count.loc[(state_party_win_count.State == state) & (state_party_win_count.Party == party), "vote_pc"] = party_vote_pc
-
-state_dem_win_count = state_party_win_count[state_party_win_count.Party == "DEMOCRAT"].reset_index(drop = True)
-state_rep_win_count = state_party_win_count[state_party_win_count.Party == "REPUBLICAN"].reset_index(drop = True)
-
-state_party_win_count = pd.DataFrame({
-    "State": state_dem_win_count.State,
-    "Dem_votes": state_dem_win_count.Votes,
-    "Dem_pc": state_dem_win_count.vote_pc,
-    "Rep_votes": state_rep_win_count.Votes,
-    "Rep_pc": state_rep_win_count.vote_pc
-}).sort_values("Dem_pc", ascending = False)
+# electoral_college = electoral_college.groupby(["State", "Party"])["Votes"].count().reset_index()
+# electoral_college = pd.concat([electoral_college, dc_republican], ignore_index = True, axis = 0).sort_values(["State", "Party"])
+# dem_votes = electoral_college.loc[electoral_college.Party == "DEMOCRAT", :].set_index("State")
+# rep_votes = electoral_college.loc[electoral_college.Party == "REPUBLICAN", :].set_index("State")
+# print(electoral_college.loc[electoral_college.Party == "DEMOCRAT", :].set_index("State")["Votes"])
