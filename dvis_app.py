@@ -7,13 +7,14 @@ import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
 import pandas as pd
+import numpy as np
 import dash
 from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output, State
 import json
 import dash_daq as daq
-from dvis_data import pres_states, pres_states_winners, pres_counties, pres_county_winners, usa_states, senate_winners, senate, electoral_college, pres_bios
+from dvis_data import pres_states, pres_states_winners, pres_counties, pres_county_winners, usa_states, senate_winners, senate, electoral_college, state_party_win_count, pres_bios
 from skimage import io
 from senateGraph import senate_graph
 ########
@@ -38,6 +39,10 @@ graph2 = dcc.Loading(
     id = "loading-2",
     children = [dcc.Graph(id = "graph2")],
     type = "circle"
+)
+graph3 = dcc.Loading(
+    id = "loading-3",
+    children = [dcc.Graph(id = "graph3")]
 )
 
 store = dcc.Store(id = 'session', storage_type = 'session')
@@ -153,6 +158,9 @@ app.layout = html.Div([
         "display": "flex",
         "flex-align": "row"
     }),
+    html.Div([
+        graph3
+    ]),
     html.Br(),
 ],
 style = {"background-color": background_color, "min-width": "100vw", "min-height": "100vh"}
@@ -216,6 +224,20 @@ def on_click(clickdata, presidential, year, data):
     if not presidential:
         data["states"]=list(set(data["states"])- (set(senate.state_po.unique())-set(senate[senate.year==year].state_po.unique())))
     return data
+
+
+@app.callback(
+    Output(component_id = "graph3", component_property = "figure"),
+    Input(component_id = "presidential_toggle", component_property = "value")
+)
+def update_graph3(presidential):
+    if presidential:
+        fig_3 = go.Figure()
+        fig_3.add_bar(x = state_party_win_count.State.unique(), y = state_party_win_count.loc[state_party_win_count.Party == "DEMOCRAT", "Votes"])
+        fig_3.add_bar(x = state_party_win_count.State.unique(), y = state_party_win_count.loc[state_party_win_count.Party == "REPUBLICAN", "Votes"])
+        fig_3.update_layout(barmode = "relative")
+
+    return fig_3
 
 
 @app.callback(

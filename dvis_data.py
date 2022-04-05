@@ -163,3 +163,16 @@ electoral_college["state_po"] = electoral_college.State.map(state_po_map)
 # map Party to full party name
 college_party_map = {"R": "REPUBLICAN", "D": "DEMOCRAT"}
 electoral_college["Party"] = electoral_college.Party.map(college_party_map)
+
+# determine number of times each state voted for each party (electoral college votes)
+state_party_win_count = electoral_college[electoral_college.Year >= 1900].groupby(["State", "Party"])["Votes"].count()
+state_party_win_count = state_party_win_count.reset_index()
+# add republican 0 count for D.C.
+dc_republican = pd.DataFrame({
+    "State": ["D.C."],
+    "Party": ["REPUBLICAN"],
+    "Votes": [0]
+})
+state_party_win_count = pd.concat([state_party_win_count, dc_republican], ignore_index = True, axis = 0).sort_values("State")
+print(state_party_win_count[state_party_win_count.State == "D.C."])
+print(state_party_win_count.loc[state_party_win_count.Party == "REPUBLICAN", "Votes"])
