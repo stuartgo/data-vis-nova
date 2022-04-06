@@ -283,13 +283,25 @@ def update_graph3(year_range):
     min_year, max_year = year_range[0], year_range[1]
     electoral_college_copy = electoral_college[(electoral_college.Year >= min_year) & (electoral_college.Year <= max_year)]
     electoral_college_copy = electoral_college_copy.groupby(["State", "Party"])["Votes"].count().reset_index()
-    # adds a republican count of 0 to D.C. (otherwise nothing is shown because Republicans have never won D.C.)
-    dc_republican = pd.DataFrame({
-        "State": ["D.C."],
-        "Party": ["REPUBLICAN"],
-        "Votes": [0]
-    })
-    electoral_college_copy = pd.concat([electoral_college_copy, dc_republican], ignore_index = True, axis = 0).sort_values(["State", "Party"])
+    # if the year range selected results in a state having no democrat or republican wins, this loop will create an entry for that state with a count of 0 victories
+    # if these 0 count entries are not created then bars will simply disappear from the graph
+    for state in electoral_college_copy.State:
+        if electoral_college_copy[electoral_college_copy.State == state].shape[0] == 1:
+            party = electoral_college_copy.loc[electoral_college_copy.State == state, "Party"].values
+            if party == "REPUBLICAN":
+                df_concat = pd.DataFrame({
+                    "State": state,
+                    "Party": ["DEMOCRAT"],
+                    "Votes": [0]
+                })
+            elif party == "DEMOCRAT":
+                df_concat = pd.DataFrame({
+                    "State": state,
+                    "Party": ["REPUBLICAN"],
+                    "Votes": [0]
+                })
+            print(df_concat)
+            electoral_college_copy = pd.concat([electoral_college_copy, df_concat], ignore_index = True, axis = 0).sort_values(["State", "Party"])
     # determine number of democrat and republican votes
     dem_votes = electoral_college_copy.loc[electoral_college_copy.Party == "DEMOCRAT", :].set_index("State")["Votes"]
     rep_votes = electoral_college_copy.loc[electoral_college_copy.Party == "REPUBLICAN", :].set_index("State")["Votes"]
