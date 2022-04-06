@@ -3,6 +3,7 @@
 #### Import libraries/modules/data ####
 from itertools import dropwhile
 from lib2to3.pygram import pattern_symbols
+from turtle import bgcolor
 import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
@@ -253,7 +254,6 @@ def on_click(clickdata, presidential, year, data):
         if new_state in data["states"]:
             data["states"].remove(new_state)
         else:
-            print("yeeeeeeeeeeeeeeeeeeeeeet added")
             data["states"].append(new_state)
     #removes states from secondary graph that are not part of the senate elections
     if not presidential:
@@ -295,7 +295,10 @@ def update_graph3(year_range):
         xaxis_title = "State",
         yaxis_title = "Victories, %",
         hovermode = "x",
-        barmode = "stack"
+        barmode = "stack",
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        font_color = font_color,
     )
     fig_3.add_hline(
         y = 50,

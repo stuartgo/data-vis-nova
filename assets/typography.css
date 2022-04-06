@@ -14,12 +14,16 @@ body{
     color: #7fafdf !important;
 }
 
-.rc-slider-step{
+.rc-slider-rail{
     background-color: #1f2630;
+}
+#year_slider .rc-slider-track{
+    background-color: #1f2630 !important;
 }
 
 .rc-slider-track{
-    background-color: #7fafdf;
+    background-color: #7fafdf !important;
+
 }
 
 .rc-slider-handle{
