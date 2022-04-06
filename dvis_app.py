@@ -191,8 +191,10 @@ app.layout = html.Div([
                 allowCross = False,
                 tooltip = {
                     "placement": "left",
-                    "always_visible": True
+                    "always_visible": False
                 },
+                # vertical = True,
+                # verticalHeight = 300,
                 id = "range-slider"
             ),
         ]),
@@ -292,11 +294,13 @@ def update_graph3(year_range):
     fig_3 = go.Figure()
     fig_3.add_bar(
         x = electoral_college_copy.State.unique(),
-        y = dem_votes/(dem_votes+rep_votes)*100
+        y = dem_votes/(dem_votes+rep_votes)*100,
+        name = "Democrat"
     )
     fig_3.add_bar(
         x = electoral_college_copy.State.unique(),
-        y = rep_votes/(dem_votes+rep_votes)*100
+        y = rep_votes/(dem_votes+rep_votes)*100,
+        name = "Republican"
     )
     fig_3.update_layout(
         # title = "Party victories per state",
@@ -312,7 +316,7 @@ def update_graph3(year_range):
         y = 50,
         line_width = 2,
         line_dash = "dash",
-        line_color = "black",
+        line_color = "white",
     )
 
     return fig_3
