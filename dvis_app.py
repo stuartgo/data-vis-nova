@@ -15,7 +15,7 @@ from dash import html
 from dash.dependencies import Input, Output, State
 import json
 import dash_daq as daq
-from dvis_data import pres_states, pres_states_winners, pres_counties, pres_county_winners, usa_states, senate_winners, senate, electoral_college, pres_bios
+from dvis_data import pres_states, pres_states_winners, pres_counties, pres_county_winners, usa_states, senate_winners, senate, electoral_college, census_2020, pres_bios
 from skimage import io
 from senateGraph import senate_graph
 ########

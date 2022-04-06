@@ -21,6 +21,7 @@ def load_data():
     senate = pd.read_csv("1976-2020-senate.csv", encoding = 'latin1') # senate elections
     info_counties = pd.read_csv("counties.csv") # county-level information, includes coordinates
     electoral_college = pd.read_csv("electoral_college.csv") # electoral college votes per state
+    census_2020 = pd.read_excel("states_correlation_dataset.xlsx")
     pres_bios = pd.read_excel("president_bios.xlsx") # information on party candidates since 2000
     pres_bios.party = pres_bios.party.str.upper()
 
