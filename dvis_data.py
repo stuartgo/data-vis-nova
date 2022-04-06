@@ -48,10 +48,10 @@ def load_data():
         inplace = True
     )
 
-    return (pres_states, pres_counties, senate, info_counties, electoral_college, pres_bios)
+    return (pres_states, pres_counties, senate, info_counties, electoral_college, census_2020, pres_bios)
 
 # Import data, drop unecessary columns and rows
-pres_states, pres_counties, senate, info_counties, electoral_college, pres_bios = load_data()
+pres_states, pres_counties, senate, info_counties, electoral_college, census_2020, pres_bios = load_data()
 pres_states = pres_states[pres_states.year >= 1996]
 
 # Rename colum and rename the libertarian party as other
