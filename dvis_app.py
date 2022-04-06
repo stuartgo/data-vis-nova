@@ -188,12 +188,20 @@ app.layout = html.Div([
                 2020,
                 4,
                 value = [1900, 2020],
+                marks = dict((value, str(value)) for value in range(1900, 2021, 20)),
+                allowCross = False,
+                tooltip = {
+                    "placement": "left",
+                    "always_visible": True
+                },
                 id = "range-slider"
             ),
         ]),
         graph3
     ],
     style = {
+        "margin-right": "20px",
+        "margin-left": "20px",
         "padding-left": "20px",
         "padding-right": "20px",
         "background-color": box_color
