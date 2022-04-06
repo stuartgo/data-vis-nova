@@ -284,7 +284,7 @@ def update_graph3(year_range):
     electoral_college_copy = electoral_college[(electoral_college.Year >= min_year) & (electoral_college.Year <= max_year)]
     electoral_college_copy = electoral_college_copy.groupby(["State", "Party"])["Votes"].count().reset_index()
     # if the year range selected results in a state having no democrat or republican wins, this loop will create an entry for that state with a count of 0 victories
-    # if these 0 count entries are not created then bars will simply disappear from the graph
+    # if these 0-count entries are not created, bars will simply disappear from the graph
     for state in electoral_college_copy.State:
         if electoral_college_copy[electoral_college_copy.State == state].shape[0] == 1:
             party = electoral_college_copy.loc[electoral_college_copy.State == state, "Party"].values
@@ -300,7 +300,6 @@ def update_graph3(year_range):
                     "Party": ["REPUBLICAN"],
                     "Votes": [0]
                 })
-            print(df_concat)
             electoral_college_copy = pd.concat([electoral_college_copy, df_concat], ignore_index = True, axis = 0).sort_values(["State", "Party"])
     # determine number of democrat and republican votes
     dem_votes = electoral_college_copy.loc[electoral_college_copy.Party == "DEMOCRAT", :].set_index("State")["Votes"]
