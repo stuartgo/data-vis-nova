@@ -64,14 +64,15 @@ slider = dcc.Slider(
 name_graph1 = "Number of votes by party by year"
 name_graph2 = "Number of popular votes by party" 
 name_graph3 = "Number of electoral votes by party"
-name_graph4 = "NNNNNNEEEEEEEEh"
+name_graph4 = "Senate seat distribution"
 dropdown = dcc.Dropdown(
-    [name_graph1, name_graph2, name_graph3, name_graph4],
+    [name_graph1, name_graph2, name_graph3],
     name_graph1,
     id = "dropdown",
     searchable = False
 )
-
+presidential_graphs=[name_graph1, name_graph2, name_graph3]
+senate_graphs=[name_graph1, name_graph2, name_graph3, name_graph4]
 app.layout = html.Div([
     store,
     html.Div([
@@ -208,9 +209,11 @@ style = {"background-color": background_color, "min-width": "100vw", "min-height
     Output(component_id = "year_slider",component_property="min"),
     Output(component_id = "year_slider",component_property="max"),
     Output(component_id = "year_slider",component_property="step"),
+    Output(component_id="dropdown",component_property="options"),
     Input(component_id = "presidential_toggle", component_property = "value"),
 )
 def presidential_toggle(presidential_toggle):
+    
     if presidential_toggle:
          return {
             2000: {"label": "2000", "style": {"color": red}},
@@ -219,13 +222,13 @@ def presidential_toggle(presidential_toggle):
             2012: {"label": "2012", "style": {"color": blue}},
             2016: {"label": "2016", "style": {"color": red}},
             2020: {"label": "2020", "style": {"color": blue}}
-        },2000,2020,4
+        },2000,2020,4,presidential_graphs
         
     else:
         temp = {}
         for i in range(1976, 2022, 2):
             temp[i] = {"label": str(i)}
-        return temp, 1976, 2020, 2
+        return temp, 1976, 2020, 2,senate_graphs
 
 
 @app.callback(

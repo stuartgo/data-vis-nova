@@ -1,5 +1,5 @@
 import plotly.express as px
-
+from dvis_data import senate_winners
 import math
 import pandas as pd
 print("shits")
@@ -10,11 +10,12 @@ def senate_graph(year,senate_winners,color_map):
     print("schmixx")
     print(senate_winners)
     senate_data=senate_winners.drop_duplicates(["state"])
-
-    senate_seats_data=senate_data.seats.apply(lambda x:x.split(" ") )
-    senate_seats_data=senate_seats_data.apply(lambda x: [x[0],x[0]] if len(x)==1 else x)
-    senate_seats_data=senate_seats_data.explode()
-    senate_seats_data.sort_values(inplace=True)
+    print(senate_data)
+    senate_data.seats=senate_data.seats.apply(lambda x:x.split(" ") )
+    senate_data.seats=senate_data.seats.apply(lambda x: [x[0],x[0]] if len(x)==1 else x)
+    senate_data=senate_data.explode("seats")
+    senate_data.sort_values(by=["seats"],inplace=True)
+    print(senate_data)
     radiuses=[3,4,5,6,7]
     num_points=[16,18,20,22,24]
     points=[]
@@ -23,11 +24,11 @@ def senate_graph(year,senate_winners,color_map):
             angle=(math.pi/(num_points[index]-1))*point_num
             points.append((math.cos(angle)*radius,math.sin(angle)*radius,radius))
     data=pd.DataFrame(points)
-    data.columns=["x","y","color"]
+    data.columns=["x","y","party"]
     data.sort_values("x",inplace=True)
-    data.color=senate_seats_data.to_list()
-
-    fig = px.scatter(data, x="x", y="y", color="color",color_discrete_map=color_map)
+    data.party=senate_data["seats"].to_list()
+    data["state"]=senate_data["state"].to_list()
+    fig = px.scatter(data, x="x", y="y", color="party",hover_data = {"party":True, "state":True,"x":False,"y":False},color_discrete_map=color_map)
     fig.update_yaxes(
         scaleanchor = "x",
         scaleratio = 1,
@@ -38,5 +39,13 @@ def senate_graph(year,senate_winners,color_map):
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
+        legend_title="Party"
     )
     return fig
+
+
+# senate_graph(2020,senate_winners,{
+#             "REPUBLICAN": "red",
+#             "DEMOCRAT": "blue",
+#             "OTHER": "green"
+#         }).write_html("temp.html")
