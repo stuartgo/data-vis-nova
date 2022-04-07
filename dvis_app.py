@@ -45,6 +45,10 @@ graph3 = dcc.Loading(
     id = "loading-3",
     children = [dcc.Graph(id = "graph3")]
 )
+graph4 = dcc.Loading(
+    id = "loading-4",
+    children = [dcc.Graph(id = "graph4")]
+)
 
 store = dcc.Store(id = 'session', storage_type = 'session')
 # create a slider to select the year for which to retrieve election data
@@ -208,6 +212,37 @@ app.layout = html.Div([
         "padding-right": "20px",
         "background-color": box_color
     }),
+    html.Div([
+        html.H2(
+            "Placeholder",
+            id = "graph4-title",
+            style = {
+                "text-align": "left",
+                "color": font_color,
+                "font:family": "playfair display,sans-serif",
+                "padding-top": "20px",
+                "padding-left": "20px"
+            }
+        ),
+        html.P(
+            "This is a placeholder text.",
+            style = {
+                "text-align": "left",
+                "color": font_color,
+                "font:family": "playfair display,sans-serif",
+                "padding-left": "20px"
+            }
+        ),
+        graph4
+    ],
+    style = {
+        "margin-right": "20px",
+        "margin-left": "20px",
+        "padding-left": "20px",
+        "padding-right": "20px",
+        "background-color": box_color
+    }
+    ),
     html.Br(),
 ],
 style = {"background-color": background_color, "min-width": "100vw", "min-height": "100vh"}
@@ -272,6 +307,28 @@ def on_click(clickdata, presidential, year, data):
     if not presidential:
         data["states"]=list(set(data["states"])- (set(senate.state_po.unique())-set(senate[senate.year==year].state_po.unique())))
     return data
+
+
+@app.callback(
+    Output(component_id = "graph4", component_property = "figure"),
+    Input(component_id = "presidential_toggle", component_property = "value")
+)
+def update_graph4(presidential):
+    if presidential:
+        census_2020_x = census_2020.drop(columns = ["party_2020", "state"])
+        census_2020_y = census_2020["party_2020"]
+
+        democrat_pearson_corr = {}
+        for col in list(census_2020_x.columns):
+            democrat_pearson_corr[col] = [np.corrcoef(census_2020_x[col], census_2020_y)[0, 1]]
+    pearson_corr = {var: corr for var, corr in sorted(democrat_pearson_corr.items(), key = lambda item: item[1])}
+    pearson_corr_df = pd.DataFrame.from_dict(pearson_corr)
+    fig_4 = px.imshow(
+        pearson_corr_df,
+        color_continuous_scale = "Bluered_r",
+    )
+
+    return fig_4
 
 
 @app.callback(
@@ -509,7 +566,7 @@ def update_graph(year, data, presidential):
             choropleth.showlegend=False
     return fig_1
 
-    
+
 
 if __name__ == "__main__":
     app.run_server(debug = True)
