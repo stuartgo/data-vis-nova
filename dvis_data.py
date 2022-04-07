@@ -54,6 +54,9 @@ def load_data():
 pres_states, pres_counties, senate, info_counties, electoral_college, census_2020, pres_bios = load_data()
 pres_states = pres_states[pres_states.year >= 1996]
 
+# replace republican with 1 and democrat with 0
+census_2020["party_2020"] = census_2020["party_2020"].replace({"REPUBLICAN": 0, "DEMOCRAT": 1})
+
 # Rename colum and rename the libertarian party as other
 pres_states.rename(columns = {"party_simplified": "party"}, inplace = True)
 pres_states.party.replace({"LIBERTARIAN": "OTHER"}, inplace = True)
@@ -164,3 +167,28 @@ electoral_college["state_po"] = electoral_college.State.map(state_po_map)
 # map Party to full party name
 college_party_map = {"R": "REPUBLICAN", "D": "DEMOCRAT"}
 electoral_college["Party"] = electoral_college.Party.map(college_party_map)
+
+
+### test correlation dataset
+# from sklearn.linear_model import LogisticRegression
+# from sklearn.metrics import accuracy_score, precision_score, recall_score
+# from sklearn.model_selection import train_test_split
+# import matplotlib.pyplot as plt
+# from sklearn.feature_selection import mutual_info_classif
+# from sklearn.preprocessing import MinMaxScaler
+# import seaborn as sns
+
+# X = census_2020.drop(columns = ["party_2020", "state"])
+# y = census_2020["party_2020"]
+# scaler = MinMaxScaler()
+# X_scaled = scaler.fit_transform(X)
+
+# # mutual info classifier for the metric_features
+# mutual_information = mutual_info_classif(X_scaled, y, random_state = 123)
+# plt.subplots(1, figsize=(26, 1))
+# sns.heatmap(mutual_information[:, np.newaxis].T, cmap='Blues', cbar=False, linewidths=1, annot=True)
+# plt.yticks([], [])
+# plt.gca().set_xticklabels(X.columns, rotation=45, ha='right', fontsize=12)
+# plt.suptitle("Train Variable Importance (mutual_info_classif)", fontsize=18, y=1.2)
+# plt.gcf().subplots_adjust(wspace=0.2)
+# plt.show()

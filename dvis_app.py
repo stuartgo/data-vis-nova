@@ -509,7 +509,7 @@ def update_graph(year, data, presidential):
             choropleth.showlegend=False
     return fig_1
 
-
+    
 
 if __name__ == "__main__":
     app.run_server(debug = True)
