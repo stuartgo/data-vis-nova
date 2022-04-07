@@ -69,6 +69,7 @@ name_graph1 = "Number of votes by party by year"
 name_graph2 = "Number of popular votes by party" 
 name_graph3 = "Number of electoral votes by party"
 name_graph4 = "Senate seat distribution"
+
 dropdown = dcc.Dropdown(
     [name_graph1, name_graph2, name_graph3],
     name_graph1,
