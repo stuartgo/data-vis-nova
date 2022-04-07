@@ -214,7 +214,7 @@ app.layout = html.Div([
     }),
     html.Div([
         html.H2(
-            "The 2020 Election: correlation between state demographics and winning party",
+            "A closer look at the 2020 Election: correlation between state demographics and winning party",
             id = "graph4-title",
             style = {
                 "text-align": "left",
@@ -225,13 +225,39 @@ app.layout = html.Div([
             }
         ),
         html.P(
-            "Placeholder text.",
+            "Explore the demographic differences between states who voted democrat or republican in 2020.",
             style = {
                 "text-align": "left",
                 "color": font_color,
                 "font:family": "playfair display,sans-serif",
                 "padding-left": "20px"
             }
+        ),
+        html.Div([
+            dcc.Checklist(
+                [
+                    "Ethnicity",
+                    "Age bracket",
+                    "Nationality", 
+                    "Employment",
+                    "Education",
+                    "Health",
+                    "Wealth",
+                    "Others"
+                ],
+                ["Ethnicity"],
+                id = "correlation-checklist"
+            )
+        ],
+        style = {
+            "margin_right": "20px",
+            "margin-left": "20px",
+            "padding-left": "20px",
+            "padding-right": "20px",
+            "font:family": "playfair display,sans-serif",
+            "color": font_color,
+            "background-color": box_color
+        }
         ),
         graph4
     ],
@@ -312,18 +338,37 @@ def on_click(clickdata, presidential, year, data):
 
 @app.callback(
     Output(component_id = "graph4", component_property = "figure"),
-    Input(component_id = "presidential_toggle", component_property = "value")
+    Input(component_id = "correlation-checklist", component_property = "value")
 )
-def update_graph4(presidential):
-    if presidential:
-        census_2020_x = census_2020.drop(columns = ["party_2020", "state"])
-        census_2020_y = census_2020["party_2020"]
+def update_graph4(checklist):
+    print(checklist)
+    cols_dictionary = {
+        "Ethnicity": ["White", "Indian", "Black", "Pacific islander", "Asian", "Two or more races"],
+        "Age bracket": ["Under 18", "18 to 65", "Over 65"],
+        "Nationality": ["Foreign born", "Don't speak english at home"],
+        "Employment": ["Unemployed", "Private sector", "Public sector", "Self-employed"],
+        "Education": ["Highschool or higher", "BSc or higher"],
+        "Health": ["Disabled", "No health insurance"],
+        "Wealth": ["Median gross rent", "Median household income", "Poverty"],
+        "Others": ["Households with computer", "Households with internet", "Mean commute time"]
+    }
+    cols_selected = []
+    for check in checklist:
+        cols = cols_dictionary[check]
+        cols_selected += cols
 
-        democrat_pearson_corr = {}
-        for col in list(census_2020_x.columns):
-            democrat_pearson_corr[col] = [np.corrcoef(census_2020_x[col], census_2020_y)[0, 1]]
+    census_2020_x = census_2020[cols_selected]
+
+    # census_2020_x = census_2020[cols]
+    census_2020_y = census_2020["party_2020"]
+    democrat_pearson_corr = {}
+
+    for col in list(census_2020_x.columns):
+        democrat_pearson_corr[col] = [np.corrcoef(census_2020_x[col], census_2020_y)[0, 1]]
+        
     pearson_corr = {var: corr for var, corr in sorted(democrat_pearson_corr.items(), key = lambda item: item[1])}
     pearson_corr_df = pd.DataFrame.from_dict(pearson_corr)
+
     fig_4 = px.imshow(
         pearson_corr_df,
         color_continuous_scale = "Bluered_r",

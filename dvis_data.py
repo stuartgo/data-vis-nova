@@ -170,13 +170,11 @@ electoral_college["Party"] = electoral_college.Party.map(college_party_map)
 
 
 # determine correlation between the variables in census_2020 and voting
-census_2020_x = census_2020.drop(columns = ["party_2020", "state"])
-census_2020_y = census_2020["party_2020"]
+# census_2020_x = census_2020.drop(columns = ["party_2020", "state"])
+# census_2020_y = census_2020["party_2020"]
 
-democrat_pearson_corr = {}
-for col in list(census_2020_x.columns):
-    democrat_pearson_corr[col] = [np.corrcoef(census_2020_x[col], census_2020_y)[0, 1]]
-pearson_corr = {var: corr for var, corr in sorted(democrat_pearson_corr.items(), key = lambda item: item[1])}
-pearson_corr_df = pd.DataFrame.from_dict(pearson_corr)
-
-print(pearson_corr_df)
+# democrat_pearson_corr = {}
+# for col in list(census_2020_x.columns):
+#     democrat_pearson_corr[col] = [np.corrcoef(census_2020_x[col], census_2020_y)[0, 1]]
+# pearson_corr = {var: corr for var, corr in sorted(democrat_pearson_corr.items(), key = lambda item: item[1])}
+# pearson_corr_df = pd.DataFrame.from_dict(pearson_corr)
