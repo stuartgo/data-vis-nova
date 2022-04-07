@@ -371,6 +371,8 @@ def update_graph4(checklist):
 
     fig_4 = px.imshow(
         pearson_corr_df,
+        zmin = -1,
+        zmax = 1,
         color_continuous_scale = "Bluered_r",
         color_continuous_midpoint = 0
     )
