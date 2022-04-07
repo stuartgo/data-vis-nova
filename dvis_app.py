@@ -214,7 +214,7 @@ app.layout = html.Div([
     }),
     html.Div([
         html.H2(
-            "Placeholder",
+            "The 2020 Election: correlation between state demographics and winning party",
             id = "graph4-title",
             style = {
                 "text-align": "left",
@@ -225,7 +225,7 @@ app.layout = html.Div([
             }
         ),
         html.P(
-            "This is a placeholder text.",
+            "Placeholder text.",
             style = {
                 "text-align": "left",
                 "color": font_color,
@@ -236,11 +236,12 @@ app.layout = html.Div([
         graph4
     ],
     style = {
+        # "width": "60%",
         "margin-right": "20px",
         "margin-left": "20px",
         "padding-left": "20px",
         "padding-right": "20px",
-        "background-color": box_color
+        "background-color": box_color,
     }
     ),
     html.Br(),
@@ -326,6 +327,12 @@ def update_graph4(presidential):
     fig_4 = px.imshow(
         pearson_corr_df,
         color_continuous_scale = "Bluered_r",
+        color_continuous_midpoint = 0
+    )
+    fig_4.update_layout(
+        paper_bgcolor = 'rgba(0,0,0,0)',
+        plot_bgcolor = 'rgba(0,0,0,0)',
+        font_color = font_color,
     )
 
     return fig_4
