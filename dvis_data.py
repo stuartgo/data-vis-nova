@@ -178,3 +178,7 @@ electoral_college["Party"] = electoral_college.Party.map(college_party_map)
 #     democrat_pearson_corr[col] = [np.corrcoef(census_2020_x[col], census_2020_y)[0, 1]]
 # pearson_corr = {var: corr for var, corr in sorted(democrat_pearson_corr.items(), key = lambda item: item[1])}
 # pearson_corr_df = pd.DataFrame.from_dict(pearson_corr)
+# state_1 = "Alabama"
+# # census_2020_copy = census_2020.drop(columns = ["state_po", "population", "Persons per household", "Median gross rent", "Mean commute time", "Median household income", "party_2020"]).copy()
+# state_1_census = census_2020[census_2020.state == state_1].drop(columns = ["state", "state_po", "population", "Persons per household", "Median gross rent", "Mean commute time", "Median household income", "party_2020"]).copy()
+# print([state_1_census.iloc[0, n] for n in range(0, state_1_census.shape[1])])

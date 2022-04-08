@@ -6,6 +6,7 @@ from lib2to3.pygram import pattern_symbols
 from turtle import bgcolor
 import plotly.graph_objects as go
 import plotly.express as px
+import plotly.figure_factory as ff
 from plotly.subplots import make_subplots
 import pandas as pd
 import numpy as np
@@ -48,6 +49,10 @@ graph3 = dcc.Loading(
 graph4 = dcc.Loading(
     id = "loading-4",
     children = [dcc.Graph(id = "graph4")]
+)
+graph5 = dcc.Loading(
+    id = "loading-5",
+    children = [dcc.Graph(id = "graph5")]
 )
 
 store = dcc.Store(id = 'session', storage_type = 'session')
@@ -269,8 +274,14 @@ app.layout = html.Div([
         "padding-left": "20px",
         "padding-right": "20px",
         "background-color": box_color,
-    }
-    ),
+    }),
+    html.Div([
+        html.Div([
+            dcc.Input(id = "input_state_1", type = "text", placeholder = "State 1", debounce = True),
+            dcc.Input(id = "input_state_2", type = "text", placeholder = "State 2", debounce = True)
+        ]),
+        graph5
+    ]),
     html.Br(),
 ],
 style = {"background-color": background_color, "min-width": "100vw", "min-height": "100vh"}
@@ -337,12 +348,68 @@ def on_click(clickdata, presidential, year, data):
     return data
 
 
+# radar plot of two specified states
+@app.callback(
+    Output(component_id = "graph5", component_property = "figure"),
+    Input(component_id = "input_state_1", component_property = "value"),
+    Input(component_id = "input_state_2", component_property = "value")
+)
+def update_graph5(state_1, state_2):
+    # census_2020_copy = census_2020[(census_2020.state == state_1) | (census_2020.state == state_2)]
+
+    census_2020_copy = census_2020.drop(
+        columns = [
+            "state_po",
+            "population",
+            "Persons per household",
+            "Median gross rent",
+            "Mean commute time",
+            "Median household income",
+            "party_2020"        
+        ]
+    ).copy()
+
+    state_1_census = census_2020_copy[census_2020_copy.state == state_1].drop(columns = "state").copy()
+    state_2_census = census_2020_copy[census_2020_copy.state == state_2].drop(columns = "state").copy()
+
+    fig_5 = go.Figure()
+
+    fig_5.add_trace(
+        go.Scatterpolar(
+            r = [state_1_census.iloc[0, n] for n in range(0, state_1_census.shape[1], 1)],
+            theta = [column for column in state_1_census],
+            fill = "toself",
+            name = state_1
+        )
+    )
+
+    fig_5.add_trace(
+        go.Scatterpolar(
+            r = [state_2_census.iloc[0, n] for n in range(0, state_2_census.shape[1], 1)],
+            theta = [column for column in state_2_census],
+            fill = "toself",
+            name = state_2
+        )
+    )
+
+    # for state in census_2020_copy.state:
+    #     print([census_2020_copy.drop(columns = "state").iloc[0, n] for n in range(0, census_2020_copy[census_2020_copy.state == state].drop(columns = "state").shape[1])])
+    #     fig_5.add_trace(
+    #         go.Scatterpolar(
+    #             r = [census_2020_copy.drop(columns = "state").iloc[0, n] for n in range(0, census_2020_copy[census_2020_copy.state == state].drop(columns = "state").shape[1])],
+    #             theta = [column for column in census_2020_copy[census_2020_copy.state == state].drop(columns = "state")],
+    #             fill = "toself",
+    #             name = state
+    #         )
+    #     )
+
+    return fig_5
+
 @app.callback(
     Output(component_id = "graph4", component_property = "figure"),
     Input(component_id = "correlation-checklist", component_property = "value")
 )
 def update_graph4(checklist):
-    print(checklist)
     cols_dictionary = {
         "Ethnicity": ["White", "Indian", "Black", "Pacific islander", "Asian", "Two or more races"],
         "Age bracket": ["Under 18", "18 to 65", "Over 65"],
@@ -456,7 +523,6 @@ def update_graph3(year_range):
     Input(component_id = "presidential_toggle", component_property = "value")
 )
 def update_graph2(year, dropdown, data, presidential):
-    print(dropdown)
     if presidential:
         data_graph = pres_states[pres_states["state_po"].isin(data["states"])].copy()
         electoral_college_copy = electoral_college[electoral_college["state_po"].isin(data["states"])].copy()
@@ -517,8 +583,7 @@ def update_graph2(year, dropdown, data, presidential):
             }
         )
     elif dropdown==name_graph4:
-        print("cunt")
-        fig_2=senate_graph(year,senate_winners,{
+        fig_2 = senate_graph(year,senate_winners,{
             "REPUBLICAN": red,
             "DEMOCRAT": blue,
             "OTHER": green
@@ -527,6 +592,7 @@ def update_graph2(year, dropdown, data, presidential):
             legend_title="Parties",
             legend_font_color=font_color,
         )
+
     fig_2.update_layout(
         # xaxis = {"categoryorder": "total descending"},
         #showlegend = False,
