@@ -48,11 +48,11 @@ graph3 = dcc.Loading(
 )
 graph4 = dcc.Loading(
     id = "loading-4",
-    children = [dcc.Graph(id = "graph4")]
+    children = [dcc.Graph(id = "graph4", style = {"width": "100vh", "height": "50vh"})]
 )
 graph5 = dcc.Loading(
     id = "loading-5",
-    children = [dcc.Graph(id = "graph5")]
+    children = [dcc.Graph(id = "graph5", style = {"width": "80vh", "height": "45vh"})]
 )
 
 store = dcc.Store(id = 'session', storage_type = 'session')
@@ -111,6 +111,7 @@ app.layout = html.Div([
         ],
         style={}
     ),
+
     html.Div([
         html.Div([
             html.Div([
@@ -171,6 +172,7 @@ app.layout = html.Div([
         "display": "flex",
         "flex-align": "row"
     }),
+
     html.Div([
         html.H2(
             "Mirror, mirror on the wall... who's the bluest of them all?",
@@ -218,16 +220,17 @@ app.layout = html.Div([
         "padding-right": "20px",
         "background-color": box_color
     }),
+
     html.Div([
         html.H2(
-            "A closer look at the 2020 Election: correlation between state demographics and winning party",
+            "The 2020 election: correlation between state demographics and winning party",
             id = "graph4-title",
             style = {
                 "text-align": "left",
                 "color": font_color,
                 "font:family": "playfair display,sans-serif",
                 "padding-top": "20px",
-                "padding-left": "20px"
+                "padding-left": "35px"
             }
         ),
         html.P(
@@ -236,56 +239,69 @@ app.layout = html.Div([
                 "text-align": "left",
                 "color": font_color,
                 "font:family": "playfair display,sans-serif",
-                "padding-left": "20px"
+                "padding-left": "35px"
             }
         ),
         html.Div([
-            dcc.Checklist(
-                [
-                    "Ethnicity",
-                    "Age bracket",
-                    "Nationality", 
-                    "Employment",
-                    "Education",
-                    "Health",
-                    "Wealth",
-                    "Others"
+            dcc.Checklist([
+                "Ethnicity",
+                "Age bracket",
+                "Nationality",
+                "Employment",
+                "Education",
+                "Health",
+                "Wealth",
+                "Others"
                 ],
                 ["Ethnicity"],
                 id = "correlation-checklist"
-            )
+            ),
+            graph4
         ],
         style = {
-            "margin_right": "20px",
+            "display": "inline-block",
+            "margin-right": "20px",
             "margin-left": "20px",
             "padding-left": "20px",
             "padding-right": "20px",
             "font:family": "playfair display,sans-serif",
             "color": font_color,
             "background-color": box_color
-        }
-        ),
-        graph4
+        }),
+        html.Div([
+            dcc.Input(
+                id = "input_state_1",
+                type = "text",
+                value = "Alabama",
+                placeholder = "State 1",
+                debounce = True
+            ),
+            dcc.Input(
+                id = "input_state_2",
+                type = "text",
+                value = "Alaska",
+                placeholder = "State 2",
+                debounce = True
+            ),
+            graph5
+        ],
+        style = {
+            "display": "inline-block",
+            "background-color": box_color
+        }),
     ],
     style = {
-        # "width": "60%",
+        "background-color": box_color,
         "margin-right": "20px",
         "margin-left": "20px",
-        "padding-left": "20px",
-        "padding-right": "20px",
-        "background-color": box_color,
+        "margin-top": "20px"
     }),
-    html.Div([
-        html.Div([
-            dcc.Input(id = "input_state_1", type = "text", placeholder = "State 1", debounce = True),
-            dcc.Input(id = "input_state_2", type = "text", placeholder = "State 2", debounce = True)
-        ]),
-        graph5
-    ]),
-    html.Br(),
 ],
-style = {"background-color": background_color, "min-width": "100vw", "min-height": "100vh"}
-)
+style = {
+    "background-color": background_color,
+    "min-width": "100vw",
+    "min-height": "100vh"
+})
 
 
 @app.callback(
@@ -324,7 +340,6 @@ def presidential_toggle(presidential_toggle):
 )
 def on_click(clickdata, presidential, year, data):
     ctx = dash.callback_context
-    print(clickdata)
     #initialize or get session data
     data = data or {"states": []}
     #sets presidential boolean in session data
@@ -335,7 +350,6 @@ def on_click(clickdata, presidential, year, data):
     #gets data on which state was clicked
     new_state = clickdata["points"][0]["location"]
     #prevents state from being updated when clicking the presidential toggle
-    print(ctx.triggered)
     if not ctx.triggered[0]["prop_id"]=="presidential_toggle.value":
         #update the visbility of a state
         if new_state in data["states"]:
@@ -352,56 +366,69 @@ def on_click(clickdata, presidential, year, data):
 @app.callback(
     Output(component_id = "graph5", component_property = "figure"),
     Input(component_id = "input_state_1", component_property = "value"),
-    Input(component_id = "input_state_2", component_property = "value")
+    Input(component_id = "input_state_2", component_property = "value"),
+    Input(component_id = "correlation-checklist", component_property = "value")
 )
-def update_graph5(state_1, state_2):
-    # census_2020_copy = census_2020[(census_2020.state == state_1) | (census_2020.state == state_2)]
+def update_graph5(state_1, state_2, checklist):
+    cols_dictionary = {
+        "Ethnicity": ["White", "Indian", "Black", "Asian"],
+        "Age bracket": ["Under 18", "18 to 65", "Over 65"],
+        "Nationality": ["Foreign born", "Don't speak english at home"],
+        "Employment": ["Unemployed", "Private sector", "Public sector", "Self-employed"],
+        "Education": ["Highschool or higher", "BSc or higher"],
+        "Health": ["Disabled", "No health insurance"],
+        "Wealth": ["Median gross rent", "Median household income", "Poverty"],
+        "Others": ["Households with computer", "Households with internet", "Mean commute time"]
+    }
 
-    census_2020_copy = census_2020.drop(
-        columns = [
-            "state_po",
-            "population",
-            "Persons per household",
-            "Median gross rent",
-            "Mean commute time",
-            "Median household income",
-            "party_2020"        
-        ]
-    ).copy()
+    cols_selected = []
+    for check in checklist:
+        cols = cols_dictionary[check]
+        cols_selected += cols
 
-    state_1_census = census_2020_copy[census_2020_copy.state == state_1].drop(columns = "state").copy()
-    state_2_census = census_2020_copy[census_2020_copy.state == state_2].drop(columns = "state").copy()
+    if type(state_1) == str:
+        state_1 = state_1.title()
+    if type(state_2) == str:
+        state_2 = state_2.title()
+
+    # census_2020_copy = census_2020[cols_selected].drop(
+    #     columns = [
+    #         "state_po",
+    #         "population",
+    #         "Persons per household",
+    #         "Median gross rent",
+    #         "Mean commute time",
+    #         "Median household income",
+    #         "party_2020"        
+    #     ]
+    # ).copy()
+
+    state_1_census = census_2020.loc[census_2020.state == state_1, cols_selected].copy()
+    state_2_census = census_2020.loc[census_2020.state == state_2, cols_selected].copy()
 
     fig_5 = go.Figure()
-
     fig_5.add_trace(
         go.Scatterpolar(
-            r = [state_1_census.iloc[0, n] for n in range(0, state_1_census.shape[1], 1)],
+            r = [item for sublist in state_1_census.values.tolist() for item in sublist],
             theta = [column for column in state_1_census],
             fill = "toself",
             name = state_1
         )
     )
-
     fig_5.add_trace(
         go.Scatterpolar(
-            r = [state_2_census.iloc[0, n] for n in range(0, state_2_census.shape[1], 1)],
+            r = [item for sublist in state_2_census.values.tolist() for item in sublist],
             theta = [column for column in state_2_census],
             fill = "toself",
             name = state_2
         )
     )
-
-    # for state in census_2020_copy.state:
-    #     print([census_2020_copy.drop(columns = "state").iloc[0, n] for n in range(0, census_2020_copy[census_2020_copy.state == state].drop(columns = "state").shape[1])])
-    #     fig_5.add_trace(
-    #         go.Scatterpolar(
-    #             r = [census_2020_copy.drop(columns = "state").iloc[0, n] for n in range(0, census_2020_copy[census_2020_copy.state == state].drop(columns = "state").shape[1])],
-    #             theta = [column for column in census_2020_copy[census_2020_copy.state == state].drop(columns = "state")],
-    #             fill = "toself",
-    #             name = state
-    #         )
-    #     )
+    fig_5.update_layout(
+        margin = dict(l= 25, r = 25, t = 25, b = 25),
+        paper_bgcolor = 'rgba(0,0,0,0)',
+        plot_bgcolor = 'rgba(0,0,0,0)',
+        font_color = font_color,
+    )
 
     return fig_5
 
@@ -411,7 +438,7 @@ def update_graph5(state_1, state_2):
 )
 def update_graph4(checklist):
     cols_dictionary = {
-        "Ethnicity": ["White", "Indian", "Black", "Pacific islander", "Asian", "Two or more races"],
+        "Ethnicity": ["White", "Indian", "Black", "Asian"],
         "Age bracket": ["Under 18", "18 to 65", "Over 65"],
         "Nationality": ["Foreign born", "Don't speak english at home"],
         "Employment": ["Unemployed", "Private sector", "Public sector", "Self-employed"],
@@ -455,13 +482,14 @@ def update_graph4(checklist):
 
 @app.callback(
     Output(component_id = "graph3", component_property = "figure"),
-    Input(component_id = "range-slider", component_property = "value")
+    Input(component_id = "range-slider", component_property = "value"),
+    Input("session","data")
 )
-def update_graph3(year_range):
+def update_graph3(year_range, data):
     # filters dataframe according to the year range selected in the slider
     min_year, max_year = year_range[0], year_range[1]
     electoral_college_copy = electoral_college[(electoral_college.Year >= min_year) & (electoral_college.Year <= max_year)]
-    electoral_college_copy = electoral_college_copy.groupby(["State", "Party"])["Votes"].count().reset_index()
+    electoral_college_copy = electoral_college_copy.groupby(["State", "state_po" ,"Party"])["Votes"].count().reset_index()
     # if the year range selected results in a state having no democrat or republican wins, this loop will create an entry for that state with a count of 0 victories
     # if these 0-count entries are not created, bars will simply disappear from the graph
     for state in electoral_college_copy.State:
@@ -483,16 +511,39 @@ def update_graph3(year_range):
     # determine number of democrat and republican votes
     dem_votes = electoral_college_copy.loc[electoral_college_copy.Party == "DEMOCRAT", :].set_index("State")["Votes"]
     rep_votes = electoral_college_copy.loc[electoral_college_copy.Party == "REPUBLICAN", :].set_index("State")["Votes"]
-    
+    print(electoral_college_copy.head())
+    selected_states = data["states"]
+
+    color_state = []
+    for state in electoral_college_copy.state_po.unique():
+        if state in selected_states:
+            color_state.append(True)
+        else:
+            color_state.append(False)
+
+    def bar_color_democrat(i):
+        if i:
+            return blue
+        else:
+            return "lightgray"
+
+    def bar_color_republican(i):
+        if i:
+            return red
+        else:
+            return "darkgray"
+
     fig_3 = go.Figure()
     fig_3.add_bar(
         x = electoral_college_copy.State.unique(),
         y = dem_votes/(dem_votes+rep_votes)*100,
+        marker_color = list(map(bar_color_democrat, color_state)),
         name = "Democrat"
     )
     fig_3.add_bar(
         x = electoral_college_copy.State.unique(),
         y = rep_votes/(dem_votes+rep_votes)*100,
+        marker_color = list(map(bar_color_republican, color_state)),
         name = "Republican"
     )
     fig_3.update_layout(
@@ -505,6 +556,7 @@ def update_graph3(year_range):
         plot_bgcolor='rgba(0,0,0,0)',
         font_color = font_color,
     )
+
     fig_3.add_hline(
         y = 50,
         line_width = 2,

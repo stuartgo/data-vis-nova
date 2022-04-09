@@ -168,17 +168,12 @@ electoral_college["state_po"] = electoral_college.State.map(state_po_map)
 college_party_map = {"R": "REPUBLICAN", "D": "DEMOCRAT"}
 electoral_college["Party"] = electoral_college.Party.map(college_party_map)
 
+# print(electoral_college.head())
 
-# determine correlation between the variables in census_2020 and voting
-# census_2020_x = census_2020.drop(columns = ["party_2020", "state"])
-# census_2020_y = census_2020["party_2020"]
 
-# democrat_pearson_corr = {}
-# for col in list(census_2020_x.columns):
-#     democrat_pearson_corr[col] = [np.corrcoef(census_2020_x[col], census_2020_y)[0, 1]]
-# pearson_corr = {var: corr for var, corr in sorted(democrat_pearson_corr.items(), key = lambda item: item[1])}
-# pearson_corr_df = pd.DataFrame.from_dict(pearson_corr)
-# state_1 = "Alabama"
-# # census_2020_copy = census_2020.drop(columns = ["state_po", "population", "Persons per household", "Median gross rent", "Mean commute time", "Median household income", "party_2020"]).copy()
-# state_1_census = census_2020[census_2020.state == state_1].drop(columns = ["state", "state_po", "population", "Persons per household", "Median gross rent", "Mean commute time", "Median household income", "party_2020"]).copy()
-# print([state_1_census.iloc[0, n] for n in range(0, state_1_census.shape[1])])
+# min_year = 1950
+# max_year = 2020
+
+# electoral_college_copy = electoral_college[(electoral_college.Year >= min_year) & (electoral_college.Year <= max_year)]
+# electoral_college_copy = electoral_college_copy.groupby(["State", "state_po", "Party"])["Votes"].count().reset_index()
+# print(electoral_college_copy.head())
