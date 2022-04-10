@@ -52,7 +52,7 @@ def load_data():
 
 # Import data, drop unecessary columns and rows
 pres_states, pres_counties, senate, info_counties, electoral_college, census_2020, pres_bios = load_data()
-pres_states = pres_states[pres_states.year >= 1996]
+pres_states = pres_states[pres_states.year >= 1976]
 
 # replace republican with 1 and democrat with 0
 census_2020["party_2020"] = census_2020["party_2020"].replace({"REPUBLICAN": 0, "DEMOCRAT": 1})
@@ -167,13 +167,3 @@ electoral_college["state_po"] = electoral_college.State.map(state_po_map)
 # map Party to full party name
 college_party_map = {"R": "REPUBLICAN", "D": "DEMOCRAT"}
 electoral_college["Party"] = electoral_college.Party.map(college_party_map)
-
-# print(electoral_college.head())
-
-
-# min_year = 1950
-# max_year = 2020
-
-# electoral_college_copy = electoral_college[(electoral_college.Year >= min_year) & (electoral_college.Year <= max_year)]
-# electoral_college_copy = electoral_college_copy.groupby(["State", "state_po", "Party"])["Votes"].count().reset_index()
-# print(electoral_college_copy.head())
