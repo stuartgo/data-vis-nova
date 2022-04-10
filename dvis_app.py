@@ -212,9 +212,8 @@ app.layout = html.Div([
                 "margin-right": "10px",
                 "display": "inline-block",
                 "height": "90px",
-                "width": "475px"
-            }
-            ),
+                "width": "280px"
+            }),
             html.Div([
                 html.H3(
                     id = "republican-candidate",
@@ -240,9 +239,10 @@ app.layout = html.Div([
                 "background-color": box_color,
                 "vertical-align": "top",
                 "margin-bottom": "10px",
+                "margin-right": "4px",
                 "display": "inline-block",
                 "height": "90px",
-                "width": "475px"
+                "width": "276px"
             }),
             html.Div([
                 html.Div([
@@ -256,6 +256,7 @@ app.layout = html.Div([
             style = {
                 "background-color": box_color,
                 "padding-top": "10px",
+                "margin-right": "5px",
                 "height": "470px"
             })
         ],
@@ -309,7 +310,7 @@ app.layout = html.Div([
             )
         ],
         style = {
-            "width": "2.5%",
+            "width": "3.5%",
             "margin-left": "20px",
             # "margin-top": "20px",
             "background-color": box_color,
@@ -322,18 +323,20 @@ app.layout = html.Div([
             ],
             style = {
                 "background-color": box_color,
-                "margin-bottom": "10px"
+                "margin-bottom": "10px",
+                "margin-right": "10px"
             }),
             html.Div([
                 line_plot
             ],
             style = {
-                "background-color": box_color
+                "background-color": box_color,
+                "margin-right": "10px"
             }),
         ],
         style = {
             # "background-color": background_color
-            "width": "95%",
+            "width": "94.5%",
             "height": "95%",
             "display": "inline-block",
             "vertical-align": "top",
@@ -342,7 +345,8 @@ app.layout = html.Div([
         })
     ],
     style = {
-        "background-color": background_color
+        "background-color": background_color,
+        "margin-right": "20px"
     }),
     html.Div([
         html.Div([
@@ -404,7 +408,7 @@ app.layout = html.Div([
             ],
             style = {
                 "margin-bottom": "20px",
-                "width": "1400px",
+                "width": "740px",
                 "height": "500px",
                 "background-color": box_color
             })
@@ -443,7 +447,7 @@ app.layout = html.Div([
         style = {
             "vertical-align": "top",
             "display": "inline-block",
-            "width": "1095px",
+            "width": "740px",
             "height": "560px",
             "background-color": box_color
         }),
@@ -584,14 +588,13 @@ def update_radar_plot(state_dropdown, checklist):
                 )
             )
     radar_plot.update_layout(
-        margin = dict(l= 18, r = 18, t = 18, b = 18),
+        margin = dict(l= 10, r = 10, t = 25, b = 25),
         paper_bgcolor = 'rgba(0,0,0,0)',
         plot_bgcolor = 'rgba(0,0,0,0)',
-        # font_color = font_color,
         font = dict(
             size = 14,
             color = font_color
-        )        
+        )
     )
 
     return radar_plot
@@ -634,7 +637,7 @@ def update_correlation_heatmap(checklist):
         zmax = 1,
         color_continuous_scale = "Bluered_r",
         color_continuous_midpoint = 0,
-        width = 1400,
+        width = 750,
         height = 500
     )
     fig_4.update_layout(
@@ -766,7 +769,7 @@ def update_year_range_plots(year_range, data):
     line_plot.update_layout(
         paper_bgcolor = box_color,
         plot_bgcolor = box_color,
-        showlegend = False,
+        # showlegend = False,
         font_color = font_color,
         xaxis = dict(
             tickmode = "linear",
@@ -847,7 +850,7 @@ def update_graph2(year, dropdown, data, presidential):
         plot_bgcolor = box_color,
         # font_color = font_color,
         font = dict(
-            size = 14,
+            size = 12,
             color = font_color
         )
     )
