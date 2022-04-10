@@ -28,10 +28,14 @@ external_scripts=[{
     "crossorigin":"anonymous"
 }]
 app = dash.Dash(__name__, external_scripts=external_scripts)
+
+# commonly used colors
 background_color = "#1f2630"
 box_color = "#252e3f"
 font_color = "#7fafdf"
 red, blue, green, grey, purple = "#ef553b", "#636efa", "#66CC00","#f0f0f0","#A9629B"
+
+# load graphs
 graph = dcc.Loading(
     id = "loading-1",
     children = [dcc.Graph(id = "usa_map", figure = {"layout": {"plot_bgcolor": background_color}})],
@@ -42,21 +46,21 @@ graph2 = dcc.Loading(
     children = [dcc.Graph(id = "graph2", figure = {"layout": {"plot_bgcolor": background_color}})],
     type = "circle"
 )
-graph3a = dcc.Loading(
+stacked_bars = dcc.Loading(
     id = "loading-3a",
-    children = [dcc.Graph(id = "graph3a", figure = {"layout": go.Layout(margin = {"t": 0})})]
+    children = [dcc.Graph(id = "stacked_bars", figure = {"layout": go.Layout(margin = {"t": 0})})]
 )
-graph3b = dcc.Loading(
+line_plot = dcc.Loading(
     id = "loading-3b",
-    children = [dcc.Graph(id = "graph3b", figure = {"layout": go.Layout(margin = {"t": 0})})]
+    children = [dcc.Graph(id = "line_plot", figure = {"layout": go.Layout(margin = {"t": 0})})]
 )
-graph4 = dcc.Loading(
+correlation_heatmap = dcc.Loading(
     id = "loading-4",
-    children = [dcc.Graph(id = "graph4", style = {"width": "100vh", "height": "30vh"})]
+    children = [dcc.Graph(id = "correlation_heatmap", style = {"width": "100vh", "height": "30vh"})]
 )
-graph5 = dcc.Loading(
+radar_plot = dcc.Loading(
     id = "loading-5",
-    children = [dcc.Graph(id = "graph5", style = {"width": "80vh", "height": "40vh"})]
+    children = [dcc.Graph(id = "radar_plot", style = {"width": "80vh", "height": "40vh"})]
 )
 
 store = dcc.Store(id = 'session', storage_type = 'session')
@@ -80,18 +84,18 @@ slider = dcc.Slider(
     }
 )
 #TODO: These bad boys need better names
-name_graph2 = "Number of popular votes by party" 
-name_graph3 = "Number of electoral votes by party"
-name_graph4 = "Senate seat distribution"
+name_graph1 = "Number of popular votes by party" 
+name_graph2 = "Number of electoral votes by party"
+name_graph3 = "Senate seat distribution"
 
 dropdown = dcc.Dropdown(
-    [name_graph2, name_graph3],
-    name_graph2,
+    [name_graph1, name_graph2],
+    name_graph1,
     id = "dropdown",
     searchable = False
 )
-presidential_graphs=[name_graph2, name_graph3]
-senate_graphs=[name_graph2, name_graph3, name_graph4]
+presidential_graphs=[name_graph1, name_graph2]
+senate_graphs=[name_graph1, name_graph2, name_graph3]
 app.layout = html.Div([
     store,
     html.Div([
@@ -314,14 +318,14 @@ app.layout = html.Div([
         }),
         html.Div([
             html.Div([
-                graph3a
+                stacked_bars
             ],
             style = {
                 "background-color": box_color,
                 "margin-bottom": "10px"
             }),
             html.Div([
-                graph3b
+                line_plot
             ],
             style = {
                 "background-color": box_color
@@ -344,7 +348,7 @@ app.layout = html.Div([
         html.Div([
             html.H2(
                 "The 2020 election: correlation between state demographics and winning party",
-                id = "graph4-title",
+                id = "heatmap-title",
                 style = {
                     "text-align": "left",
                     "color": font_color,
@@ -396,7 +400,7 @@ app.layout = html.Div([
                 "background-color": box_color
             }),
             html.Div([
-                graph4
+                correlation_heatmap
             ],
             style = {
                 "margin-bottom": "20px",
@@ -433,7 +437,7 @@ app.layout = html.Div([
                 "margin-top": "10px"
             }),
             html.Div([
-                graph5
+                radar_plot
             ])
         ],
         style = {
@@ -545,11 +549,11 @@ def presidential_candidates(year):
 
 # radar plot of two specified states
 @app.callback(
-    Output(component_id = "graph5", component_property = "figure"),
+    Output(component_id = "radar_plot", component_property = "figure"),
     Input(component_id = "state-dropdown", component_property = "value"),
     Input(component_id = "correlation-checklist", component_property = "value")
 )
-def update_graph5(state_dropdown, checklist):
+def update_radar_plot(state_dropdown, checklist):
     print(state_dropdown)
     cols_dictionary = {
         "Ethnicity": ["White", "Indian", "Black", "Asian"],
@@ -567,11 +571,11 @@ def update_graph5(state_dropdown, checklist):
         cols = cols_dictionary[check]
         cols_selected += cols
 
-    fig_5 = go.Figure()
+    radar_plot = go.Figure()
     # if statement prevents an error if no state is selected in the dropdown
     if type(state_dropdown) == list:
         for state in state_dropdown:
-            fig_5.add_trace(
+            radar_plot.add_trace(
                 go.Scatterpolar(
                     r = [item for sublist in census_2020.loc[census_2020.state == state, cols_selected].copy().values.tolist() for item in sublist],
                     theta = [column for column in census_2020.loc[census_2020.state == state, cols_selected]],
@@ -579,20 +583,24 @@ def update_graph5(state_dropdown, checklist):
                     name = state
                 )
             )
-    fig_5.update_layout(
+    radar_plot.update_layout(
         margin = dict(l= 18, r = 18, t = 18, b = 18),
         paper_bgcolor = 'rgba(0,0,0,0)',
         plot_bgcolor = 'rgba(0,0,0,0)',
-        font_color = font_color,
+        # font_color = font_color,
+        font = dict(
+            size = 14,
+            color = font_color
+        )        
     )
 
-    return fig_5
+    return radar_plot
 
 @app.callback(
-    Output(component_id = "graph4", component_property = "figure"),
+    Output(component_id = "correlation_heatmap", component_property = "figure"),
     Input(component_id = "correlation-checklist", component_property = "value")
 )
-def update_graph4(checklist):
+def update_correlation_heatmap(checklist):
     cols_dictionary = {
         "Ethnicity": ["White", "Indian", "Black", "Asian"],
         "Age bracket": ["Under 18", "18 to 65", "Over 65"],
@@ -641,12 +649,12 @@ def update_graph4(checklist):
 
 
 @app.callback(
-    Output(component_id = "graph3a", component_property = "figure"),
-    Output(component_id = "graph3b", component_property = "figure"),
+    Output(component_id = "stacked_bars", component_property = "figure"),
+    Output(component_id = "line_plot", component_property = "figure"),
     Input(component_id = "range-slider", component_property = "value"),
     Input("session","data")
 )
-def update_graph3(year_range, data):
+def update_year_range_plots(year_range, data):
     # filters dataframe according to the year range selected in the slider
     min_year, max_year = year_range[0], year_range[1]
     electoral_college_copy = electoral_college[(electoral_college.Year >= min_year) & (electoral_college.Year <= max_year)].copy()
@@ -699,22 +707,22 @@ def update_graph3(year_range, data):
         else:
             return box_color
 
-    fig_3a = go.Figure()
-    fig_3a.add_bar(
+    stacked_bars = go.Figure()
+    stacked_bars.add_bar(
         x = electoral_college_copy.State.unique(),
         y = dem_votes/(dem_votes+rep_votes)*100,
         marker_color = list(map(bar_color_democrat, color_state)),
         name = "Democrat",
         showlegend = False
     )
-    fig_3a.add_bar(
+    stacked_bars.add_bar(
         x = electoral_college_copy.State.unique(),
         y = rep_votes/(dem_votes+rep_votes)*100,
         marker_color = list(map(bar_color_republican, color_state)),
         name = "Republican",
         showlegend = False
     )
-    fig_3a.update_layout(
+    stacked_bars.update_layout(
         # title = "Party victories per state",
         xaxis_title = "State",
         yaxis_title = "Victories, %",
@@ -724,18 +732,17 @@ def update_graph3(year_range, data):
         plot_bgcolor='rgba(0,0,0,0)',
         font_color = font_color,
     )
-    fig_3a.add_hline(
+    stacked_bars.add_hline(
         y = 50,
         line_width = 2,
         line_dash = "dash",
         line_color = "white",
     )
 
-    
     pres_states_copy = pres_states[(pres_states.year >= min_year) & (pres_states.year <= max_year)].copy()
     pres_states_copy = pres_states_copy[pres_states["state_po"].isin(data["states"])]
 
-    fig_3b = px.line(
+    line_plot = px.line(
         pres_states_copy.groupby(["year","party"]).sum().reset_index(level=[0,1]),
         x = "year",
         y = "candidatevotes",
@@ -752,11 +759,11 @@ def update_graph3(year_range, data):
         }
     )
 
-    fig_3b.update_traces(
+    line_plot.update_traces(
         line = dict(width = 3)
     )
 
-    fig_3b.update_layout(
+    line_plot.update_layout(
         paper_bgcolor = box_color,
         plot_bgcolor = box_color,
         showlegend = False,
@@ -767,7 +774,7 @@ def update_graph3(year_range, data):
         )
     )
 
-    return fig_3a, fig_3b
+    return stacked_bars, line_plot
 
 
 @app.callback(
@@ -784,7 +791,7 @@ def update_graph2(year, dropdown, data, presidential):
     else:
         data_graph=senate[senate["state_po"].isin(data["states"])].copy()
        
-    if dropdown == name_graph2:
+    if dropdown == name_graph1:
         fig_2 = px.bar(
             data_frame = data_graph[data_graph.year == year],#.sort_values("candidatevotes", ascending = False),
             x = "party",
@@ -805,7 +812,7 @@ def update_graph2(year, dropdown, data, presidential):
             orientation = "v",
             height = 395
         )
-    elif dropdown == name_graph3:
+    elif dropdown == name_graph2:
         fig_2 = px.bar(
             data_frame = electoral_college_copy[electoral_college_copy.Year == year],
             x = "Party",
@@ -822,7 +829,7 @@ def update_graph2(year, dropdown, data, presidential):
                 "Votes": "Number of electoral college votes"
             }
         )
-    elif dropdown == name_graph4:
+    elif dropdown == name_graph3:
         fig_2 = senate_graph(year,senate_winners,{
             "REPUBLICAN": red,
             "DEMOCRAT": blue,
@@ -885,7 +892,7 @@ def update_graph(year, data, presidential):
         
     # define colors for the parties
     
-    fig_1 = px.choropleth(
+    usa_choropleth = px.choropleth(
         data_frame = graph_data,
         locationmode = "USA-states",
         locations = "state_po",
@@ -909,7 +916,7 @@ def update_graph(year, data, presidential):
         #     "swing": False
         # },
     )
-    fig_1.add_scattergeo(
+    usa_choropleth.add_scattergeo(
         locationmode = "USA-states",
         locations = graph_data["state_po"],
         text = graph_data["state_po"],
@@ -919,17 +926,17 @@ def update_graph(year, data, presidential):
         hoverinfo="skip",
         showlegend=False
     )
-    fig_1.update_layout(
+    usa_choropleth.update_layout(
         margin = dict(l = 0, r = 0, b = 0, t = 0, pad = 4, autoexpand = True ),
         paper_bgcolor=box_color,
         geo=dict(bgcolor=box_color),
         legend_font_color=font_color,
         legend_title="Parties"
         )
-    for choropleth in fig_1["data"]:
+    for choropleth in usa_choropleth["data"]:
         if choropleth.name=="None":
             choropleth.showlegend=False
-    return fig_1
+    return usa_choropleth
 
 
 
