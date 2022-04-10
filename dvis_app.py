@@ -257,7 +257,8 @@ app.layout = html.Div([
                 "background-color": box_color,
                 "padding-top": "10px",
                 "margin-right": "5px",
-                "height": "470px"
+                "height": "470px",
+                "width": "565px"
             })
         ],
         style = {
@@ -558,7 +559,6 @@ def presidential_candidates(year):
     Input(component_id = "correlation-checklist", component_property = "value")
 )
 def update_radar_plot(state_dropdown, checklist):
-    print(state_dropdown)
     cols_dictionary = {
         "Ethnicity": ["White", "Indian", "Black", "Asian"],
         "Age bracket": ["Under 18", "18 to 65", "Over 65"],
