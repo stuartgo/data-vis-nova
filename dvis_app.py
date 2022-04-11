@@ -169,7 +169,7 @@ app.layout = html.Div([
                 }),
                 html.Div([
                     html.Div([
-                        html.Button("Select/Unselect All",id = "select-all-states",n_clicks=0)
+                        html.Button("Select/Unselect All",id = "select-all-states", n_clicks = 0)
                     ],
                     style = {
                         "color": font_color,
@@ -199,7 +199,7 @@ app.layout = html.Div([
                                 "font-size": "30px",
                                 "text-align": "center",
                                 "margin-bottom": "3px",
-                                "margin-top": "15px"
+                                "margin-top": "15px",
                             }
                         ),
                         html.H4(
@@ -561,15 +561,20 @@ def presidential_candidates(year):
     pres_bios_copy = pres_bios[pres_bios.year == year].copy()
     dem_candidate = pres_bios_copy.loc[(pres_bios_copy.party == "DEMOCRAT"), "candidate"]
     rep_candidate = pres_bios_copy.loc[(pres_bios_copy.party == "REPUBLICAN"), "candidate"]
+    dem_electoral_votes = pres_bios_copy.loc[(pres_bios_copy.party == "DEMOCRAT"), "electoral_vote"].values.tolist()[0]
+    rep_electoral_votes = pres_bios_copy.loc[(pres_bios_copy.party == "REPUBLICAN"), "electoral_vote"].values.tolist()[0]
+    dem_pop_vote = pres_bios_copy.loc[(pres_bios_copy.party == "DEMOCRAT"), "pop_vote_pc"].values.tolist()[0]
+    rep_pop_vote = pres_bios_copy.loc[(pres_bios_copy.party == "REPUBLICAN"), "pop_vote_pc"].values.tolist()[0]
 
-    if pres_bios_copy.loc[(pres_bios_copy.party == "DEMOCRAT"), "winner"].values == 1:
-        dem_subtext = "ELECTED"
-        rep_subtext = "DEFEATED"
+    # prevents empty black boxes when there was no presidential election in the selected year (senate view)
+    if year in (range(1976, 2021, 4)):
+        dem_subtext = f"Pop. vote: {dem_pop_vote}% | Electoral votes: {dem_electoral_votes}"
+        rep_subtext = f"Pop. vote: {rep_pop_vote}% | Electoral votes: {rep_electoral_votes}"
     else:
-        dem_subtext = "DEFEATED"
-        rep_subtext = "ELECTED"
+        dem_subtext = f"No presidential election in {year}"
+        rep_subtext = f"No presidential election {year}"
 
-    return dem_candidate, dem_subtext, rep_candidate, rep_subtext
+    return (dem_candidate, dem_subtext, rep_candidate, rep_subtext)
 
 
 # radar plot of two specified states
@@ -782,7 +787,7 @@ def update_year_range_plots(year_range, data):
     )
 
     line_plot.update_traces(
-        line = dict(width = 3)
+        line = dict(width = 5)
     )
 
     line_plot.update_layout(
@@ -807,12 +812,13 @@ def update_year_range_plots(year_range, data):
     Input(component_id = "presidential_toggle", component_property = "value")
 )
 def update_graph2(year, dropdown, data, presidential):
+    electoral_college_copy = electoral_college[electoral_college["state_po"].isin(data["states"])].copy()
+
     if presidential:
         data_graph = pres_states[pres_states["state_po"].isin(data["states"])].copy()
-        electoral_college_copy = electoral_college[electoral_college["state_po"].isin(data["states"])].copy()
     else:
-        data_graph=senate[senate["state_po"].isin(data["states"])].copy()
-       
+        data_graph = senate[senate["state_po"].isin(data["states"])].copy()
+
     if dropdown == name_graph1:
         fig_2 = px.bar(
             data_frame = data_graph[data_graph.year == year],#.sort_values("candidatevotes", ascending = False),
@@ -848,7 +854,8 @@ def update_graph2(year, dropdown, data, presidential):
             labels = {
                 "Party": "Party",
                 "Votes": "Number of electoral college votes"
-            }
+            },
+            category_orders = {"Party": ["DEMOCRAT", "REPUBLICAN"]}
         )
     elif dropdown == name_graph3:
         fig_2 = senate_graph(year,senate_winners,{
