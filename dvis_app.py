@@ -56,11 +56,11 @@ line_plot = dcc.Loading(
 )
 correlation_heatmap = dcc.Loading(
     id = "loading-4",
-    children = [dcc.Graph(id = "correlation_heatmap", style = {"width": "100vh", "height": "30vh"})]
+    children = [dcc.Graph(id = "correlation_heatmap")]
 )
 radar_plot = dcc.Loading(
     id = "loading-5",
-    children = [dcc.Graph(id = "radar_plot", style = {"width": "80vh", "height": "40vh"})]
+    children = [dcc.Graph(id = "radar_plot")]
 )
 
 store = dcc.Store(id = 'session', storage_type = 'session')
@@ -69,18 +69,18 @@ slider = dcc.Slider(
     min = 1976, max = 2020, step = 4, value = 2020, # min, max, step, default of the slider
     id = "year_slider", # unique id of the slider object
     marks = {
-        1976: {"label": "1976", "style": {"color": blue}},
+        1976: {"label": "1976"},
         1980: {"label": "1980"},
         1984: {"label": "1984"},
         1988: {"label": "1988"},
         1992: {"label": "1992"},
         1996: {"label": "1996"},
-        2000: {"label": "2000", "style": {"color": red}},
-        2004: {"label": "2004", "style": {"color": red}},
-        2008: {"label": "2008", "style": {"color": blue}},
-        2012: {"label": "2012", "style": {"color": blue}},
-        2016: {"label": "2016", "style": {"color": red}},
-        2020: {"label": "2020", "style": {"color": blue}}
+        2000: {"label": "2000"},
+        2004: {"label": "2004"},
+        2008: {"label": "2008"},
+        2012: {"label": "2012"},
+        2016: {"label": "2016"},
+        2020: {"label": "2020"}
     }
 )
 #TODO: These bad boys need better names
@@ -95,7 +95,10 @@ dropdown = dcc.Dropdown(
     searchable = False
 )
 presidential_graphs=[name_graph1, name_graph2]
-senate_graphs=[name_graph1, name_graph2, name_graph3]
+senate_graphs=[name_graph1, name_graph3]
+
+
+
 app.layout = html.Div([
     store,
     html.Div([
@@ -166,7 +169,7 @@ app.layout = html.Div([
                 }),
                 html.Div([
                     html.Div([
-                        dcc.Checklist(id = "select-all-states", options = [{"label": " Select/Unselect All", "value": 1}]),
+                        html.Button("Select/Unselect All",id = "select-all-states",n_clicks=0)
                     ],
                     style = {
                         "color": font_color,
@@ -175,65 +178,68 @@ app.layout = html.Div([
                         "padding-top": "10px"
                     }),
                     graph,
-                ]),
-            ])
+                ],
+                ),
+            ],
+            style={"height":"100%","background-color":box_color}
+            )
         ],
         style = {
             "width": "60%",
-            "padding-left": "20px",
             "padding-right": "10px"
         }),
         html.Div([
             html.Div([
-                html.H3(
-                    id = "democrat-candidate",
+                    html.Div([
+                        html.H3(
+                            id = "democrat-candidate",
+                            style = {
+                                "color": blue,
+                                "font-weight": "bold",
+                                "font-size": "30px",
+                                "text-align": "center",
+                                "margin-bottom": "3px",
+                                "margin-top": "15px"
+                            }
+                        ),
+                        html.H4(
+                            id = "democrat-subtext",
+                            style = {
+                                "color": font_color,
+                                "text-align": "center",
+                                "margin-top": "0px"
+                            }
+                        )
+                    ],
                     style = {
-                        "color": blue,
-                        "font-weight": "bold",
-                        "font-size": "30px",
-                        "text-align": "center",
-                        "margin-bottom": "3px",
-                        "margin-top": "15px"
-                    }
-                ),
-                html.H4(
-                    id = "democrat-subtext",
-                    style = {
-                        "color": font_color,
-                        "text-align": "center",
-                        "margin-top": "0px"
-                    }
-                )
-            ],
-            style = {
-                "background-color": box_color,
-                "vertical-align": "top",
-                "margin-bottom": "10px",
-                "margin-right": "10px",
-                "display": "inline-block",
-                "height": "90px",
-                "width": "280px"
-            }),
-            html.Div([
-                html.H3(
-                    id = "republican-candidate",
-                    style = {
-                        "color": red,
-                        "font-weight": "bold",
-                        "font-size": "30px",
-                        "text-align": "center",
-                        "margin-bottom": "3px",
-                        "margin-top": "15px"
-                    }
-                ),
-                html.H4(
-                    id = "republican-subtext",
-                    style = {
-                        "color": font_color,
-                        "text-align": "center",
-                        "margin-top": "0px"
-                    }
-                )
+                        "background-color": box_color,
+                        "vertical-align": "top",
+                        "margin-bottom": "10px",
+                        "margin-right": "10px",
+                        "display": "inline-block",
+                        "height": "90px",
+                        "width": "50%"
+                    }),
+                    html.Div([
+                    html.H3(
+                        id = "republican-candidate",
+                        style = {
+                            "color": red,
+                            "font-weight": "bold",
+                            "font-size": "30px",
+                            "text-align": "center",
+                            "margin-bottom": "3px",
+                            "margin-top": "15px"
+                        }
+                    ),
+                    html.H4(
+                        id = "republican-subtext",
+                        style = {
+                            "color": font_color,
+                            "text-align": "center",
+                            "margin-top": "0px"
+                        }
+                    )
             ],
             style = {
                 "background-color": box_color,
@@ -242,8 +248,12 @@ app.layout = html.Div([
                 "margin-right": "4px",
                 "display": "inline-block",
                 "height": "90px",
-                "width": "276px"
+                "width": "50%"
             }),
+                    ],
+                    style={"display":"flex","flex-direction":"row"}
+                    ),
+        
             html.Div([
                 html.Div([
                     dropdown
@@ -257,15 +267,11 @@ app.layout = html.Div([
                 "background-color": box_color,
                 "padding-top": "10px",
                 "margin-right": "5px",
-                "height": "470px",
-                "width": "565px"
             })
         ],
         style = {
-            "width": "37.5%",
-            "height": "576px",
+            "width": "40%",
             "background-color": background_color,
-            "margin-right": "20px"
         })
     ],
     style = {
@@ -311,8 +317,8 @@ app.layout = html.Div([
             )
         ],
         style = {
-            "width": "3.5%",
-            "margin-left": "20px",
+            "width": "5%",
+            "padding-left":"15px",
             # "margin-top": "20px",
             "background-color": box_color,
             "display": "inline-block",
@@ -325,29 +331,26 @@ app.layout = html.Div([
             style = {
                 "background-color": box_color,
                 "margin-bottom": "10px",
-                "margin-right": "10px"
             }),
             html.Div([
                 line_plot
             ],
             style = {
                 "background-color": box_color,
-                "margin-right": "10px"
             }),
         ],
         style = {
             # "background-color": background_color
-            "width": "94.5%",
+            "width": "93%",
             "height": "95%",
             "display": "inline-block",
             "vertical-align": "top",
-            "margin-left": "10px",
+            "padding-left": "10px",
             # "margin-top": "20px"
         })
     ],
     style = {
         "background-color": background_color,
-        "margin-right": "20px"
     }),
     html.Div([
         html.Div([
@@ -409,20 +412,19 @@ app.layout = html.Div([
             ],
             style = {
                 "margin-bottom": "20px",
-                "width": "740px",
-                "height": "500px",
                 "background-color": box_color
             })
         ],
         style = {
             "display": "inline-block",
             "vertical-align": "top",
-            "margin-right": "10px",
-            "padding-left": "20px",
+            "padding-right": "10px",
             # "padding-right": "20px",
             "font:family": "playfair display,sans-serif",
             "color": font_color,
-            "background-color": background_color
+            "background-color": background_color,
+            "height":"100%",
+            "width":"50%"
         }),
         html.Div([
             html.Div([
@@ -438,7 +440,6 @@ app.layout = html.Div([
             ],
             style = {
                 "margin-left": "20px",
-                "margin-right": "20px",
                 "margin-top": "10px"
             }),
             html.Div([
@@ -448,23 +449,21 @@ app.layout = html.Div([
         style = {
             "vertical-align": "top",
             "display": "inline-block",
-            "width": "740px",
-            "height": "560px",
-            "background-color": box_color
+            "background-color": box_color,
+            "width":"48%",
+            "height":"100%"
         }),
     ],
     style = {
         "background-color": background_color,
-        "margin-right": "20px",
         "margin-top": "20px"
     }),
 ],
 style = {
     "background-color": background_color,
-    "min-width": "100vw",
+    "max-width":"100%",
     "min-height": "90vh"
 })
-
 
 @app.callback(
     Output(component_id = "year_slider",component_property="marks"),
@@ -500,18 +499,41 @@ def presidential_toggle(presidential_toggle):
 
 
 @app.callback(
+    Output(component_id = "select-all-states", component_property = "style"),
+    Input(component_id = "presidential_toggle", component_property = "value"),
+)
+def hide_button(presidential):
+    if presidential:
+        return {"display":"block"}
+    else:
+        return {"display":"none"}
+
+
+
+
+@app.callback(
     Output("session", "data"),
     Input(component_id = "usa_map", component_property = "clickData"),
     Input(component_id = "presidential_toggle", component_property = "value"),
     Input(component_id = "year_slider", component_property = "value"),
-    State("session","data")
+    State("session","data"),
+    Input(component_id = "select-all-states", component_property = "n_clicks")
 )
-def on_click(clickdata, presidential, year, data):
+def on_click(clickdata, presidential, year, data,n_clicks):
     ctx = dash.callback_context
+    if ctx.triggered[0]["prop_id"]=="select-all-states.n_clicks":
+        if len(data["states"])==len(list(senate.state_po.unique())):
+            data["states"]=[]
+        else:
+            data["states"]=list(senate.state_po.unique())
+        return data
     #initialize or get session data
     data = data or {"states": []}
     #sets presidential boolean in session data
     data["presidential"] = presidential
+    if not presidential:
+        print("senate states")
+        data["states"]=list(set(senate[senate.year==year].state_po.unique()))
     #when webapp starts there is no clickdata so this prevents an error
     if not clickdata:
         return data
@@ -525,8 +547,6 @@ def on_click(clickdata, presidential, year, data):
         else:
             data["states"].append(new_state)
     #removes states from secondary graph that are not part of the senate elections
-    if not presidential:
-        data["states"]=list(set(data["states"])- (set(senate.state_po.unique())-set(senate[senate.year==year].state_po.unique())))
     return data
 
 
@@ -637,15 +657,14 @@ def update_correlation_heatmap(checklist):
         zmax = 1,
         color_continuous_scale = "Bluered_r",
         color_continuous_midpoint = 0,
-        width = 750,
-        height = 500
     )
     fig_4.update_layout(
         yaxis = dict(showticklabels = False),
         paper_bgcolor = 'rgba(0,0,0,0)',
         plot_bgcolor = 'rgba(0,0,0,0)',
         font_color = font_color,
-        showlegend = False
+        showlegend = False,
+
     )
 
     return fig_4
@@ -813,7 +832,6 @@ def update_graph2(year, dropdown, data, presidential):
             },
             category_orders = {"party": ["DEMOCRAT", "REPUBLICAN", "OTHER"]},
             orientation = "v",
-            height = 395
         )
     elif dropdown == name_graph2:
         fig_2 = px.bar(
