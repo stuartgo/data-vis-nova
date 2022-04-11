@@ -901,14 +901,17 @@ def update_graph(year, data, presidential):
         senate_winners_copy=senate_winners.copy()
         senate_winners_copy.party=senate_winners_copy.apply(lambda x: x.party if x.state_po in data["states"] else "None", axis=1)
         graph_data= senate_winners_copy[senate_winners_copy.year == year]
+        graph_data.dropna(inplace=True)
         color_var="seats"
         color_map={
-            "REPUBLICAN REPUBLICAN": red,
-            "DEMOCRAT DEMOCRAT":blue,
-            "DEMOCRAT REPUBLICAN": purple,
-            "REPUBLICAN DEMOCRAT":purple,
-            "OTHER OTHER": green
+            "Republican": red,
+            "Democrat":blue,
+            "One each": purple,
+            "Other": green,
+            "One republican one other":"#b18b20",
+            "One democrat one other":"#65a270",
         }
+        
         
         
     # define colors for the parties
