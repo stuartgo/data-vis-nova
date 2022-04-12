@@ -1,4 +1,4 @@
-# POLITICAL LANDSCAPE OF THE USA IN THE 21ST CENTURY
+# POLITICAL LANDSCAPE OF THE USA
 
 #### Import libraries/modules/data ####
 from itertools import dropwhile
@@ -115,8 +115,9 @@ app.layout = html.Div([
             }
         ),
         html.P(
-            "This interactive web application was created to allow for the exploration of the political results and trends in the US. " +
-            "Select any of the states you would like to know more about and have fun exploring.",
+            "Explore the political results and trends in the US from 1974 to 2020. " +
+            "Select any state/combination of states to see how they voted in each election. " +
+            "Use the toggle to visualize the results of senate elections.",
             style = {
                 "text-align": "left",
                 "font:family": "playfair display,sans-serif",
@@ -292,7 +293,7 @@ app.layout = html.Div([
                 }
             ),
             html.P(
-                "There have been 12 elections since 1976. How often has each party won in each state?",
+                "There have been 12 presidential elections since 1976. How often has each party won in each state? Select the states you want to highlight in the map above and the desired time range using the slider below.",
                 style = {
                     "text-align": "left",
                     "color": font_color,
@@ -330,7 +331,7 @@ app.layout = html.Div([
             ],
             style = {
                 "background-color": box_color,
-                "margin-bottom": "10px",
+                "margin-bottom": "10px"
             }),
             html.Div([
                 line_plot
@@ -366,7 +367,7 @@ app.layout = html.Div([
                 }
             ),
             html.P(
-                "Explore the demographic differences between states who voted democrat or republican in 2020.",
+                "Did you know that, in 2020, states with a higher median household income tended to vote Democrat? And states with a higher percentage of minors leaned towards Republican? Explore the demographic differences below.",
                 style = {
                     "text-align": "left",
                     "color": font_color,
@@ -444,13 +445,16 @@ app.layout = html.Div([
             }),
             html.Div([
                 radar_plot
-            ])
+            ],
+            style = {
+                "margin-bottom": "20px",
+                "margin-left": "20px"})
         ],
         style = {
             "vertical-align": "top",
             "display": "inline-block",
             "background-color": box_color,
-            "width":"48%",
+            "width":"49%",
             "height":"100%"
         }),
     ],
@@ -555,26 +559,66 @@ def on_click(clickdata, presidential, year, data,n_clicks):
     Output(component_id = "democrat-subtext", component_property = "children"),
     Output(component_id = "republican-candidate", component_property = "children"),
     Output(component_id = "republican-subtext", component_property = "children"),
+    Output(component_id = "democrat-candidate", component_property = "style"),
+    Output(component_id = "republican-candidate", component_property = "style"),
     Input(component_id = "year_slider", component_property = "value")
 )
 def presidential_candidates(year):
-    pres_bios_copy = pres_bios[pres_bios.year == year].copy()
-    dem_candidate = pres_bios_copy.loc[(pres_bios_copy.party == "DEMOCRAT"), "candidate"]
-    rep_candidate = pres_bios_copy.loc[(pres_bios_copy.party == "REPUBLICAN"), "candidate"]
-    dem_electoral_votes = pres_bios_copy.loc[(pres_bios_copy.party == "DEMOCRAT"), "electoral_vote"].values.tolist()[0]
-    rep_electoral_votes = pres_bios_copy.loc[(pres_bios_copy.party == "REPUBLICAN"), "electoral_vote"].values.tolist()[0]
-    dem_pop_vote = pres_bios_copy.loc[(pres_bios_copy.party == "DEMOCRAT"), "pop_vote_pc"].values.tolist()[0]
-    rep_pop_vote = pres_bios_copy.loc[(pres_bios_copy.party == "REPUBLICAN"), "pop_vote_pc"].values.tolist()[0]
-
-    # prevents empty black boxes when there was no presidential election in the selected year (senate view)
-    if year in (range(1976, 2021, 4)):
-        dem_subtext = f"Pop. vote: {dem_pop_vote}% | Electoral votes: {dem_electoral_votes}"
-        rep_subtext = f"Pop. vote: {rep_pop_vote}% | Electoral votes: {rep_electoral_votes}"
-    else:
+    if year not in (range(1976, 2021, 4)):
         dem_subtext = f"No presidential election in {year}"
         rep_subtext = f"No presidential election {year}"
 
-    return (dem_candidate, dem_subtext, rep_candidate, rep_subtext)
+        return ("", dem_subtext, "", rep_subtext, {}, {})
+
+    else:
+        pres_bios_copy = pres_bios[pres_bios.year == year].copy()
+        dem_candidate = pres_bios_copy.loc[(pres_bios_copy.party == "DEMOCRAT"), "candidate"]
+        rep_candidate = pres_bios_copy.loc[(pres_bios_copy.party == "REPUBLICAN"), "candidate"]
+        dem_electoral_votes = pres_bios_copy.loc[(pres_bios_copy.party == "DEMOCRAT"), "electoral_vote"].values.tolist()[0]
+        rep_electoral_votes = pres_bios_copy.loc[(pres_bios_copy.party == "REPUBLICAN"), "electoral_vote"].values.tolist()[0]
+        dem_pop_vote = pres_bios_copy.loc[(pres_bios_copy.party == "DEMOCRAT"), "pop_vote_pc"].values.tolist()[0]
+        rep_pop_vote = pres_bios_copy.loc[(pres_bios_copy.party == "REPUBLICAN"), "pop_vote_pc"].values.tolist()[0]
+
+        # prevents empty black boxes when there was no presidential election in the selected year (senate view)
+        dem_subtext = f"Pop. vote: {dem_pop_vote}% | Electoral votes: {dem_electoral_votes}"
+        rep_subtext = f"Pop. vote: {rep_pop_vote}% | Electoral votes: {rep_electoral_votes}"
+        if pres_bios_copy.loc[pres_bios_copy.party == "DEMOCRAT", "winner"].tolist()[0] == True:
+            dem_style = {
+                "color": blue,
+                "font-weight": "bold",
+                "font-size": "30px",
+                "text-align": "center",
+                "margin-bottom": "3px",
+                "margin-top": "15px",
+                "text-decoration": "underline"
+            }
+            rep_style = {
+                "color": red,
+                "font-weight": "bold",
+                "font-size": "30px",
+                "text-align": "center",
+                "margin-bottom": "3px",
+                "margin-top": "15px"
+            }
+        else:
+            dem_style = {
+                "color": blue,
+                "font-weight": "bold",
+                "font-size": "30px",
+                "text-align": "center",
+                "margin-bottom": "3px",
+                "margin-top": "15px",
+            }
+            rep_style = {
+                "color": red,
+                "font-weight": "bold",
+                "font-size": "30px",
+                "text-align": "center",
+                "margin-bottom": "3px",
+                "margin-top": "15px",
+                "text-decoration": "underline"
+            }
+        return (dem_candidate, dem_subtext, rep_candidate, rep_subtext, dem_style, rep_style)
 
 
 # radar plot of two specified states
@@ -613,11 +657,11 @@ def update_radar_plot(state_dropdown, checklist):
                 )
             )
     radar_plot.update_layout(
-        margin = dict(l= 10, r = 10, t = 25, b = 25),
+        margin = dict(l= 20, r = 10, t = 25, b = 20),
         paper_bgcolor = 'rgba(0,0,0,0)',
         plot_bgcolor = 'rgba(0,0,0,0)',
         font = dict(
-            size = 14,
+            size = 12,
             color = font_color
         )
     )
@@ -757,7 +801,7 @@ def update_year_range_plots(year_range, data):
         barmode = "stack",
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font_color = font_color,
+        font_color = font_color
     )
     stacked_bars.add_hline(
         y = 50,
