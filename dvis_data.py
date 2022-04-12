@@ -171,7 +171,7 @@ electoral_college["Party"] = electoral_college.Party.map(college_party_map)
 
 
 
-senate_winners.seats=senate_winners.seats.map({"REPUBLICAN DEMOCRAT":"One each",
+senate_winners["seats_labels"]=senate_winners.seats.map({"REPUBLICAN DEMOCRAT":"One each",
                                 "DEMOCRAT REPUBLICAN":"One each",
                                 "REPUBLICAN REPUBLICAN":"Republican",
                                 "DEMOCRAT DEMOCRAT":"Democrat",

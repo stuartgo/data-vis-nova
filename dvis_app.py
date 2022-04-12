@@ -462,6 +462,14 @@ app.layout = html.Div([
         "background-color": background_color,
         "margin-top": "20px"
     }),
+
+html.Div([html.P("Stuart Ottersen m20210703"),
+        html.P("Nuno Melo m20210681"),
+        html.P("Ivan Parac m20210689")
+        ],
+style={
+    "color":font_color
+})
 ],
 style = {
     "background-color": background_color,
@@ -902,10 +910,13 @@ def update_graph2(year, dropdown, data, presidential):
             category_orders = {"Party": ["DEMOCRAT", "REPUBLICAN"]}
         )
     elif dropdown == name_graph3:
-        fig_2 = senate_graph(year,senate_winners,{
-            "REPUBLICAN": red,
-            "DEMOCRAT": blue,
-            "OTHER": green
+        fig_2 = senate_graph(year,senate_winners,color_map={
+            "Republican": red,
+            "Democrat":blue,
+            "One each": purple,
+            "Other": green,
+            "One republican one other":"#b18b20",
+            "One democrat one other":"#65a270",
         })
         fig_2.update_layout(
             legend_title="Parties",
@@ -953,7 +964,7 @@ def update_graph(year, data, presidential):
         senate_winners_copy.party=senate_winners_copy.apply(lambda x: x.party if x.state_po in data["states"] else "None", axis=1)
         graph_data= senate_winners_copy[senate_winners_copy.year == year]
         graph_data.dropna(inplace=True)
-        color_var="seats"
+        color_var="seats_labels"
         color_map={
             "Republican": red,
             "Democrat":blue,

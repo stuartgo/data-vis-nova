@@ -2,20 +2,15 @@ import plotly.express as px
 from dvis_data import senate_winners
 import math
 import pandas as pd
-print("shits")
 def senate_graph(year,senate_winners,color_map):
     
     senate_winners=senate_winners[senate_winners.year<=year]
     senate_winners.sort_values("year",inplace=True,ascending=False)
-    print("schmixx")
-    print(senate_winners)
     senate_data=senate_winners.drop_duplicates(["state"])
-    print(senate_data)
     senate_data.seats=senate_data.seats.apply(lambda x:x.split(" ") )
     senate_data.seats=senate_data.seats.apply(lambda x: [x[0],x[0]] if len(x)==1 else x)
     senate_data=senate_data.explode("seats")
     senate_data.sort_values(by=["seats"],inplace=True)
-    print(senate_data)
     radiuses=[3,4,5,6,7]
     num_points=[16,18,20,22,24]
     points=[]
@@ -26,8 +21,10 @@ def senate_graph(year,senate_winners,color_map):
     data=pd.DataFrame(points)
     data.columns=["x","y","party"]
     data.sort_values("x",inplace=True)
-    data.party=senate_data["seats"].to_list()
+    data.party=senate_data["seats_labels"].to_list()
     data["state"]=senate_data["state"].to_list()
+    print(data)
+    print("here")
     fig = px.scatter(data, x="x", y="y", color="party",hover_data = {"party":True, "state":True,"x":False,"y":False},color_discrete_map=color_map)
     fig.update_yaxes(
         scaleanchor = "x",
