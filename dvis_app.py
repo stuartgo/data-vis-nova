@@ -534,17 +534,16 @@ def hide_button(presidential):
 def on_click(clickdata, presidential, year, data,n_clicks):
     ctx = dash.callback_context
     if ctx.triggered[0]["prop_id"]=="select-all-states.n_clicks":
-        if len(data["states"])==len(list(senate.state_po.unique())):
+        if len(data["states"])==len(list(pres_states.state_po.unique())):
             data["states"]=[]
         else:
-            data["states"]=list(senate.state_po.unique())
+            data["states"]=list(pres_states.state_po.unique())
         return data
     #initialize or get session data
     data = data or {"states": []}
     #sets presidential boolean in session data
     data["presidential"] = presidential
     if not presidential:
-        print("senate states")
         data["states"]=list(set(senate[senate.year==year].state_po.unique()))
     #when webapp starts there is no clickdata so this prevents an error
     if not clickdata:
