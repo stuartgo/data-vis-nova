@@ -1,23 +1,16 @@
 # POLITICAL LANDSCAPE OF THE USA
 
 #### Import libraries/modules/data ####
-from itertools import dropwhile
-from lib2to3.pygram import pattern_symbols
-from turtle import bgcolor
 import plotly.graph_objects as go
 import plotly.express as px
-import plotly.figure_factory as ff
-from plotly.subplots import make_subplots
 import pandas as pd
 import numpy as np
 import dash
 from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output, State
-import json
 import dash_daq as daq
-from dvis_data import pres_states, pres_states_winners, pres_counties, pres_county_winners, usa_states, senate_winners, senate, electoral_college, census_2020, pres_bios
-from skimage import io
+from dvis_data import pres_states, pres_states_winners, senate_winners, senate, electoral_college, census_2020, pres_bios
 from senateGraph import senate_graph
 ########
 
@@ -33,7 +26,7 @@ app = dash.Dash(__name__, external_scripts=external_scripts)
 background_color = "#1f2630"
 box_color = "#252e3f"
 font_color = "#7fafdf"
-red, blue, green, grey, purple = "#ef553b", "#636efa", "#66CC00","#f0f0f0","#A9629B"
+red, blue, white, grey, purple = "#ef553b", "#636efa", "#FFE4E1","#f0f0f0","#A9629B"
 
 # load graphs
 graph = dcc.Loading(
@@ -90,7 +83,7 @@ name_graph3 = "Senate seat distribution"
 
 dropdown = dcc.Dropdown(
     [name_graph1, name_graph2],
-    name_graph1,
+    name_graph2,
     id = "dropdown",
     searchable = False
 )
@@ -115,14 +108,24 @@ app.layout = html.Div([
             }
         ),
         html.P(
-            "Explore the political results and trends in the US from 1974 to 2020. " +
-            "Select any state/combination of states to see how they voted in each election. " +
+            "Did you know that the Republicans won all but one state in 1984? " +
+            "Or that in 2 of the last 12 elections the Democrats lost despite winning the popular vote?",
+            style = {
+                "text-align": "left",
+                "font:family": "playfair display,sans-serif",
+                "color": font_color,
+                "padding-left":"20px"
+            }
+        ),
+        html.P(
+            "Explore the political results in the US from 1974 to 2020. " +
+            "Select one or multiple states to dynamically update the vote count. " +
             "Use the toggle to visualize the results of senate elections.",
             style = {
                 "text-align": "left",
                 "font:family": "playfair display,sans-serif",
                 "color": font_color,
-                "padding":"20px"
+                "padding-left":"20px"                
             }
         )
         ],
@@ -290,10 +293,11 @@ app.layout = html.Div([
                     "color": font_color,
                     "font:family": "playfair display,sans-serif",
                     "padding-left": "20px",
+                    "padding-top": "10px"
                 }
             ),
             html.P(
-                "There have been 12 presidential elections since 1976. How often has each party won in each state? Select the states you want to highlight in the map above and the desired time range using the slider below.",
+                "There have been 12 presidential elections since 1976. How often has each party won in each state? Select the states you want to highlight in the map above and the desired time range by dragging the slider below.",
                 style = {
                     "text-align": "left",
                     "color": font_color,
@@ -313,16 +317,18 @@ app.layout = html.Div([
                     "always_visible": False
                 },
                 id = "range-slider",
-                vertical = True,
-                verticalHeight = 860
+                pushable = 2,
+                persistence = True
+                # vertical = True,
+                # verticalHeight = 860
             )
         ],
         style = {
-            "width": "5%",
+            "width": "98.8%",
             "padding-left":"15px",
-            # "margin-top": "20px",
+            "margin-bottom": "10px",
             "background-color": box_color,
-            "display": "inline-block",
+            # "display": "inline-block",
             "vertical-align": "top"
         }),
         html.Div([
@@ -331,22 +337,27 @@ app.layout = html.Div([
             ],
             style = {
                 "background-color": box_color,
-                "margin-bottom": "10px"
+                "margin-bottom": "10px",
+                "margin-right": "10px",
+                "width": "59.5%",
+                "display": "inline-block"
             }),
             html.Div([
                 line_plot
             ],
             style = {
                 "background-color": box_color,
+                "display": "inline-block",
+                "margin-bottom": "10px",
+                "width": "39.5%"
             }),
         ],
         style = {
-            # "background-color": background_color
-            "width": "93%",
-            "height": "95%",
+            "background-color": background_color,
+            "width": "100%",
+            "height": "100%",
             "display": "inline-block",
             "vertical-align": "top",
-            "padding-left": "10px",
             # "margin-top": "20px"
         })
     ],
@@ -356,7 +367,7 @@ app.layout = html.Div([
     html.Div([
         html.Div([
             html.H2(
-                "The 2020 election: correlation between state demographics and winning party",
+                "The 2020 election: correlation between demographics and winning party",
                 id = "heatmap-title",
                 style = {
                     "text-align": "left",
@@ -367,7 +378,7 @@ app.layout = html.Div([
                 }
             ),
             html.P(
-                "Did you know that, in 2020, states with a higher median household income tended to vote Democrat? And states with a higher percentage of minors leaned towards Republican? Explore the demographic differences below.",
+                "In 2020, states with a higher median household income tended to vote Democrat. On the other hand, states with a higher percentage of minors leaned towards Republican.",
                 style = {
                     "text-align": "left",
                     "color": font_color,
@@ -673,6 +684,23 @@ def update_radar_plot(state_dropdown, checklist):
         )
     )
 
+    # parallel_coords = px.parallel_coordinates(
+    #     census_2020,
+    #     color = "party_2020",
+    #     color_continuous_scale = "Bluered_r",
+    #     color_continuous_midpoint = 0.5,
+    #     dimensions = cols_selected
+    # )
+
+    # parallel_coords.update_layout(
+    #     paper_bgcolor = "rgba(0,0,0,0)",
+    #     # plot_bgcolor = 'rgba(255,255,255,0.8)',
+    #     font = dict(
+    #         size = 14,
+    #         color = "black"
+    #     )
+    #     )
+
     return radar_plot
 
 @app.callback(
@@ -801,13 +829,14 @@ def update_year_range_plots(year_range, data):
         showlegend = False
     )
     stacked_bars.update_layout(
-        # title = "Party victories per state",
+        margin = dict(l = 70, r = 20, b = 150, t = 30, autoexpand = True),
         xaxis_title = "State",
         yaxis_title = "Victories, %",
         hovermode = "x",
         barmode = "stack",
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
+        font = dict(size = 12),
         font_color = font_color
     )
     stacked_bars.add_hline(
@@ -829,22 +858,27 @@ def update_year_range_plots(year_range, data):
             "candidatevotes": "Number of popular votes",
             "year": "Year"
         },
-        range_x = [min_year, max_year],
+        range_x = [min_year-1, max_year+1],
         color_discrete_map = {
             "REPUBLICAN": red,
             "DEMOCRAT": blue,
-            "OTHER": green
-        }
+            "OTHER": white
+        },
+        markers = True
     )
 
     line_plot.update_traces(
-        line = dict(width = 5)
+        line = dict(width = 5),
+        marker = dict(size = 12)
     )
 
     line_plot.update_layout(
+        margin = dict(l = 100, r = 50, b = 60, t = 40),
         paper_bgcolor = box_color,
         plot_bgcolor = box_color,
-        # showlegend = False,
+        # legend = dict(yanchor = "top", y = 1.3, xanchor = "left", x = -0.1, font = dict(size = 10)),
+        showlegend = False,
+        font = dict(size = 12),
         font_color = font_color,
         xaxis = dict(
             tickmode = "linear",
@@ -881,7 +915,7 @@ def update_graph2(year, dropdown, data, presidential):
             color_discrete_map = {
                 "REPUBLICAN": red,
                 "DEMOCRAT": blue,
-                "OTHER": green
+                "OTHER": white
             },
             labels = {
                 "party": "Party",
@@ -913,7 +947,7 @@ def update_graph2(year, dropdown, data, presidential):
             "Republican": red,
             "Democrat":blue,
             "One each": purple,
-            "Other": green,
+            "Other": white,
             "One republican one other":"#b18b20",
             "One democrat one other":"#65a270",
         })
@@ -944,8 +978,6 @@ def update_graph2(year, dropdown, data, presidential):
     Input(component_id = "presidential_toggle", component_property = "value")
 )
 def update_graph(year, data, presidential):
-    # create copies of election data and filter election data for current year
-    #pres_states_copy = pres_states[pres_states["state_po"].isin(data["states"])].copy()
     if presidential:
         pres_states_winners_copy = pres_states_winners.copy() #[pres_states_winners["state_po"].isin(data["states"])].copy()´
         pres_states_winners_copy.party = pres_states_winners_copy.apply(lambda x: x.party if x.state_po in data["states"] else "None", axis=1)
@@ -954,9 +986,9 @@ def update_graph(year, data, presidential):
         color_map={
             "REPUBLICAN": red,
             "DEMOCRAT": blue,
-            "DEMOCRATIC-FARMER-LABOR": green,
+            "DEMOCRATIC-FARMER-LABOR": white,
             "None":grey,
-            "OTHER": green
+            "OTHER": white
         }
     else:
         senate_winners_copy=senate_winners.copy()
@@ -968,15 +1000,11 @@ def update_graph(year, data, presidential):
             "Republican": red,
             "Democrat":blue,
             "One each": purple,
-            "Other": green,
+            "Other": white,
             "One republican one other":"#b18b20",
             "One democrat one other":"#65a270",
         }
         
-        
-        
-    # define colors for the parties
-    
     usa_choropleth = px.choropleth(
         data_frame = graph_data,
         locationmode = "USA-states",
@@ -986,20 +1014,6 @@ def update_graph(year, data, presidential):
         color_discrete_map = color_map,
         hover_name = "state",
         hover_data = ["totalvotes"]
-        # {
-        #     "index": False,
-        #     "year": False,
-        #     "state": False,
-        #     "state_po": False,
-        #     "state_fips": False,
-        #     "candidate": False,
-        #     "party": False,
-        #     "writein": False,
-        #     "candidatevotes": False,
-        #     "totalvotes": True,
-        #     "prev_party": False,
-        #     "swing": False
-        # },
     )
     usa_choropleth.add_scattergeo(
         locationmode = "USA-states",
@@ -1008,19 +1022,25 @@ def update_graph(year, data, presidential):
         featureidkey = "properties.NAME_3",
         mode = "text",
         textfont = dict(family = "arial", size = 10),
-        hoverinfo="skip",
-        showlegend=False
+        hoverinfo = "skip",
+        showlegend = False
     )
     usa_choropleth.update_layout(
-        margin = dict(l = 0, r = 0, b = 0, t = 0, pad = 4, autoexpand = True ),
-        paper_bgcolor=box_color,
-        geo=dict(bgcolor=box_color),
-        legend_font_color=font_color,
-        legend_title="Parties"
+        margin = dict(l = 0, r = 0, b = 0, t = 0, pad = 4, autoexpand = True),
+        paper_bgcolor = box_color,
+        geo = dict(
+            projection = go.layout.geo.Projection(type = 'albers usa'),
+            showlakes = True,
+            lakecolor = box_color,
+            bgcolor = box_color
+        ),
+        legend_font_color = font_color,
+        legend_title = "Parties"
         )
     for choropleth in usa_choropleth["data"]:
-        if choropleth.name=="None":
-            choropleth.showlegend=False
+        if choropleth.name == "None":
+            choropleth.showlegend = False
+
     return usa_choropleth
 
 

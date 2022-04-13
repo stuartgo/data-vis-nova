@@ -168,9 +168,6 @@ electoral_college["state_po"] = electoral_college.State.map(state_po_map)
 college_party_map = {"R": "REPUBLICAN", "D": "DEMOCRAT"}
 electoral_college["Party"] = electoral_college.Party.map(college_party_map)
 
-
-
-
 senate_winners["seats_labels"]=senate_winners.seats.map({"REPUBLICAN DEMOCRAT":"One each",
                                 "DEMOCRAT REPUBLICAN":"One each",
                                 "REPUBLICAN REPUBLICAN":"Republican",
