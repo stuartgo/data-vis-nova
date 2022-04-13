@@ -1010,11 +1010,19 @@ def update_graph(year, data, presidential):
         locationmode = "USA-states",
         locations = "state_po",
         scope = "usa",
-        color = color_var,
-        color_discrete_map = color_map,
+        #color = color_var,
+        #color_discrete_map = color_map,
         hover_name = "state",
         hover_data = ["totalvotes"]
     )
+
+    scatter_geo=px.scatter_geo(graph_data[graph_data.party!="None"],locations="state_po",locationmode="USA-states",size="totalvotes", color=color_var,color_discrete_map=color_map,scope="usa",size_max=40)
+    
+    for trace in scatter_geo.data:
+        usa_choropleth.add_trace(trace)
+
+
+
     usa_choropleth.add_scattergeo(
         locationmode = "USA-states",
         locations = graph_data["state_po"],
@@ -1023,8 +1031,12 @@ def update_graph(year, data, presidential):
         mode = "text",
         textfont = dict(family = "arial", size = 10),
         hoverinfo = "skip",
-        showlegend = False
+        showlegend = False,
     )
+    
+    
+
+
     usa_choropleth.update_layout(
         margin = dict(l = 0, r = 0, b = 0, t = 0, pad = 4, autoexpand = True),
         paper_bgcolor = box_color,
@@ -1038,9 +1050,9 @@ def update_graph(year, data, presidential):
         legend_title = "Parties"
         )
     for choropleth in usa_choropleth["data"]:
-        if choropleth.name == "None":
+        if choropleth.name == "":
+            choropleth.colorscale=[[0.0, '#7fafdf'], [1.0, '#7fafdf']]
             choropleth.showlegend = False
-
     return usa_choropleth
 
 
