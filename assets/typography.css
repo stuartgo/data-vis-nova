@@ -59,3 +59,21 @@ body{
     color:white !important
 
 }
+
+
+a {
+    color: #7fafdf;
+
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+  
+  a:active {
+    color: white;
+  }
+  
+  a:visited {
+    color: white;
+  }

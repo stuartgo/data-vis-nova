@@ -480,7 +480,19 @@ html.Div([html.P("Stuart Ottersen m20210703"),
         ],
 style={
     "color":font_color
-})
+}),
+html.Div([
+    html.P("Sources"),
+    html.A("Election data",href="https://electionlab.mit.edu/data"),
+    html.A("Electoral college votes", href="https://www.kaggle.com/datasets/daithibhard/us-electoral-college-votes-per-state-17882020"),
+    html.A("Census data",href="https://www.census.gov/data/datasets/2020/dec/2020-census-redistricting-summary-file-dataset.html")
+],
+style={
+    "display":"flex",
+    "flex-direction":"column",
+    "color":font_color
+}),
+
 ],
 style = {
     "background-color": background_color,
