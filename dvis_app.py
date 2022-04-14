@@ -173,7 +173,7 @@ app.layout = html.Div([
                 }),
                 html.Div([
                     html.Div([
-                        html.Button("Select/Unselect All",id = "select-all-states", n_clicks = 0)
+                        html.Button("Select/Unselect All", id = "select-all-states", n_clicks = 0)
                     ],
                     style = {
                         "color": font_color,
@@ -790,12 +790,13 @@ def update_year_range_plots(year_range, data):
     # DC state_po gets assigned NaN, fixing that
     electoral_college_copy.loc[electoral_college_copy.State == "D.C.", "state_po"] = "DC"
     # determine number of democrat and republican votes
-    dem_votes = electoral_college_copy.loc[electoral_college_copy.Party == "DEMOCRAT", :].set_index("State")["Votes"].sort_values(ascending = False)
-    rep_votes = electoral_college_copy.loc[electoral_college_copy.Party == "REPUBLICAN", :].set_index("State")["Votes"].reindex(dem_votes.index)
+    dem_votes = electoral_college_copy.loc[electoral_college_copy.Party == "DEMOCRAT", :].set_index("State")[["Votes", "state_po"]].sort_values("Votes", ascending = False)
+    rep_votes = electoral_college_copy.loc[electoral_college_copy.Party == "REPUBLICAN", :].set_index("State")[["Votes", "state_po"]].reindex(dem_votes.index)
     selected_states = data["states"]
+
     color_state = []
 
-    for state in electoral_college_copy.state_po.unique():
+    for state in dem_votes["state_po"].values.tolist():
         if state in selected_states:
             color_state.append(True)
         else:
@@ -812,18 +813,18 @@ def update_year_range_plots(year_range, data):
             return red
         else:
             return box_color
-
+            
     stacked_bars = go.Figure()
     stacked_bars.add_bar(
         x = dem_votes.index,
-        y = dem_votes/(dem_votes+rep_votes)*100,
+        y = dem_votes["Votes"]/(dem_votes["Votes"]+rep_votes["Votes"])*100,
         marker_color = list(map(bar_color_democrat, color_state)),
         name = "Democrat",
         showlegend = False
     )
     stacked_bars.add_bar(
         x = rep_votes.index,
-        y = rep_votes/(dem_votes+rep_votes)*100,
+        y = rep_votes["Votes"]/(dem_votes["Votes"]+rep_votes["Votes"])*100,
         marker_color = list(map(bar_color_republican, color_state)),
         name = "Republican",
         showlegend = False
