@@ -21,7 +21,7 @@ def senate_graph(year,senate_winners,color_map):
     data=pd.DataFrame(points)
     data.columns=["x","y","party"]
     data.sort_values("x",inplace=True)
-    data.party=senate_data["seats_labels"].to_list()
+    data.party=senate_data["seats"].to_list()
     data["state"]=senate_data["state"].to_list()
     print(data)
     print("here")

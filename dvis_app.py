@@ -494,6 +494,7 @@ style = {
     Output(component_id = "year_slider",component_property="max"),
     Output(component_id = "year_slider",component_property="step"),
     Output(component_id="dropdown",component_property="options"),
+    Output(component_id="dropdown",component_property="value"),
     Input(component_id = "presidential_toggle", component_property = "value"),
 )
 def presidential_toggle(presidential_toggle):
@@ -512,13 +513,13 @@ def presidential_toggle(presidential_toggle):
             2012: {"label": "2012", "style": {"color": font_color}},
             2016: {"label": "2016", "style": {"color": font_color}},
             2020: {"label": "2020", "style": {"color": font_color}}
-        },1976,2020,4,presidential_graphs
+        },1976,2020,4,presidential_graphs,name_graph1
         
     else:
         temp = {}
         for i in range(1976, 2022, 2):
             temp[i] = {"label": str(i)}
-        return temp, 1976, 2020, 2,senate_graphs
+        return temp, 1976, 2020, 2,senate_graphs,name_graph1
 
 
 @app.callback(
@@ -944,12 +945,11 @@ def update_graph2(year, dropdown, data, presidential):
         )
     elif dropdown == name_graph3:
         fig_2 = senate_graph(year,senate_winners,color_map={
-            "Republican": red,
-            "Democrat":blue,
-            "One each": purple,
-            "Other": white,
-            "One republican one other":"#b18b20",
-            "One democrat one other":"#65a270",
+            "REPUBLICAN": red,
+            "DEMOCRAT": blue,
+            "DEMOCRATIC-FARMER-LABOR": white,
+            "None":grey,
+            "OTHER": white
         })
         fig_2.update_layout(
             legend_title="Parties",
@@ -1016,7 +1016,7 @@ def update_graph(year, data, presidential):
         hover_data = ["totalvotes"]
     )
 
-    scatter_geo=px.scatter_geo(graph_data[graph_data.party!="None"],locations="state_po",locationmode="USA-states",size="totalvotes", color=color_var,color_discrete_map=color_map,scope="usa",size_max=40)
+    scatter_geo=px.scatter_geo(graph_data[graph_data.party!="None"],locations="state_po",locationmode="USA-states",size="totalvotes", color=color_var,color_discrete_map=color_map,scope="usa",size_max=60)
     
     for trace in scatter_geo.data:
         usa_choropleth.add_trace(trace)
