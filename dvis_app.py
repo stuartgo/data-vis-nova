@@ -26,7 +26,7 @@ app = dash.Dash(__name__, external_scripts=external_scripts)
 background_color = "#1f2630"
 box_color = "#252e3f"
 font_color = "#7fafdf"
-red, blue, white, grey, purple = "#ef553b", "#636efa", "#FFE4E1","#f0f0f0","#A9629B"
+red, blue, white, grey, purple = "#ef553b", "#636efa", "#E5E1D4","#f0f0f0","#A9629B"
 
 # load graphs
 graph = dcc.Loading(
@@ -1017,20 +1017,9 @@ def update_graph(year, data, presidential):
         hover_data = ["totalvotes"]
     )
 
-<<<<<<< HEAD
+
     scatter_geo=px.scatter_geo(graph_data[graph_data.party!="None"],locations="state_po",locationmode="USA-states",size="totalvotes", color=color_var,color_discrete_map=color_map,scope="usa",size_max=60)
-=======
-    scatter_geo = px.scatter_geo(
-        graph_data[graph_data.party!="None"],
-        locations="state_po",
-        locationmode="USA-states",
-        size="totalvotes",
-        color=color_var,
-        color_discrete_map=color_map,
-        scope="usa",
-        size_max=40
-    )
->>>>>>> 5e4f4b5ecd436d80005e95e3ad7557a90fc6927e
+
     
     for trace in scatter_geo.data:
         usa_choropleth.add_trace(trace)
@@ -1060,7 +1049,7 @@ def update_graph(year, data, presidential):
         )
     for choropleth in usa_choropleth["data"]:
         if choropleth.name == "":
-            choropleth.colorscale=[[0.0, '#7fafdf'], [1.0, '#7fafdf']]
+            choropleth.colorscale=[[0.0, white], [1.0, white]]
             choropleth.showlegend = False
 
     return usa_choropleth
