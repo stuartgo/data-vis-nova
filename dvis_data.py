@@ -16,27 +16,16 @@ def load_data():
     the USA.
     """
 
-    pres_states = pd.read_csv("1976-2020-president.csv") # state-level presidential elections
-    pres_counties = pd.read_csv("countypres_2000-2020.csv") # county-level presidential elections
-    senate = pd.read_csv("1976-2020-senate.csv", encoding = 'latin1') # senate elections
-    info_counties = pd.read_csv("counties.csv") # county-level information, includes coordinates
-    electoral_college = pd.read_csv("electoral_college.csv") # electoral college votes per state
-    census_2020 = pd.read_excel("states_correlation_dataset.xlsx")
-    pres_bios = pd.read_excel("president_bios.xlsx") # information on party candidates since 2000
+    pres_states = pd.read_csv("US_President.csv") # state-level presidential elections
+    senate = pd.read_csv("US_Senate.csv", encoding = 'latin1') # senate elections
+    electoral_college = pd.read_csv("Electoral_College.csv") # electoral college votes per state
+    census_2020 = pd.read_excel("Census_2020.xlsx")
+    pres_bios = pd.read_excel("President_Info.xlsx") # information on party candidates since 2000
     pres_bios.party = pres_bios.party.str.upper()
-
-    #fixes fips of counties
-    pres_counties.dropna(inplace=True)
-    pres_counties.county_fips=pres_counties.county_fips.astype(int)
-    pres_counties.county_fips=pres_counties.county_fips.apply(lambda x: str("0"*int((5-len(str(x))))+str(x)) if len(str(x))<5 else str(x))
 
     # drop unecessary columns
     pres_states.drop(
         columns = ["office", "version", "notes", "state_cen", "state_ic", "party_detailed"],
-        inplace = True
-    )
-    pres_counties.drop(
-        columns = ["office", "version"],
         inplace = True
     )
     senate.drop(
@@ -48,10 +37,10 @@ def load_data():
         inplace = True
     )
 
-    return (pres_states, pres_counties, senate, info_counties, electoral_college, census_2020, pres_bios)
+    return (pres_states, senate, electoral_college, census_2020, pres_bios)
 
 # Import data, drop unecessary columns and rows
-pres_states, pres_counties, senate, info_counties, electoral_college, census_2020, pres_bios = load_data()
+pres_states, senate, electoral_college, census_2020, pres_bios = load_data()
 pres_states = pres_states[pres_states.year >= 1976]
 
 # replace republican with 1 and democrat with 0
@@ -85,55 +74,48 @@ print(senate_winners)
 
 
 # Create dataframe, pres_county_winners, with most voted candidate per state per year
-pres_county_winners = pres_counties.copy()
-pres_county_winners.sort_values(["year", "county_fips", "candidatevotes"],ascending=False,inplace=True)
-pres_county_winners.drop_duplicates(["county_fips", "year"],inplace=True)
+
 
 # Find the previous winner for each county
-def previous_winner(row,state):
-    if state:
-        if row.name==len(pres_states_winners)-1:
-            return None
-        prev_row=pres_states_winners.iloc[row.name+1,:]
-        if prev_row.state_fips==row.state_fips:
-            return prev_row.party
-    else:
-        if row.name==len(pres_county_winners)-1:
-            return None
-        prev_row=pres_county_winners.iloc[row.name+1,:]
-        if prev_row.county_fips==row.county_fips:
-            return prev_row.party
-    return None
-
-pres_county_winners.sort_values(["county_fips","year"],ascending=[True,False],inplace=True)
-pres_county_winners.reset_index(inplace=True)
-pres_county_winners["prev_party"]=pres_county_winners.apply(lambda x: previous_winner(x,False) ,axis=1)
+# def previous_winner(row,state):
+#     if state:
+#         if row.name==len(pres_states_winners)-1:
+#             return None
+#         prev_row=pres_states_winners.iloc[row.name+1,:]
+#         if prev_row.state_fips==row.state_fips:
+#             return prev_row.party
+#     else:
+#         if row.name==len(pres_county_winners)-1:
+#             return None
+#         prev_row=pres_county_winners.iloc[row.name+1,:]
+#         if prev_row.county_fips==row.county_fips:
+#             return prev_row.party
+#     return None
 
 
 pres_states_winners.sort_values(["state_fips","year"],ascending=[True,False],inplace=True)
 pres_states_winners.reset_index(inplace=True)
-pres_states_winners["prev_party"]=pres_states_winners.apply(lambda x: previous_winner(x,True) ,axis=1)
+# pres_states_winners["prev_party"]=pres_states_winners.apply(lambda x: previous_winner(x,True) ,axis=1)
 
 # Determine swing states
-def swing(row):
-    if (row.party == "REPUBLICAN") and (row.prev_party == "REPUBLICAN"):
-        # red if winning party was republican for two elections in a row
-        return 0
-    if (row.party == "REPUBLICAN") and (row.prev_party != "REPUBLICAN"):
-        # red stripes if winning party changed from democrat to republican
-        return 1
-    if (row.party == "DEMOCRAT") and (row.prev_party == "DEMOCRAT"):
-        # blue if winning party was democrat for two elections in a row
-        return 0
-    if (row.party == "DEMOCRAT") and (row.prev_party != "DEMOCRAT"):
-        # red stripes if winning party changed from republican to democrat
-        return 1 
-    if (row.party != "DEMOCRAT") and (row.prev_party != "REPUBLICAN"):
-        # choose another color for non-dem/rep parties (there's only one other)
-        return 2
+# def swing(row):
+#     if (row.party == "REPUBLICAN") and (row.prev_party == "REPUBLICAN"):
+#         # red if winning party was republican for two elections in a row
+#         return 0
+#     if (row.party == "REPUBLICAN") and (row.prev_party != "REPUBLICAN"):
+#         # red stripes if winning party changed from democrat to republican
+#         return 1
+#     if (row.party == "DEMOCRAT") and (row.prev_party == "DEMOCRAT"):
+#         # blue if winning party was democrat for two elections in a row
+#         return 0
+#     if (row.party == "DEMOCRAT") and (row.prev_party != "DEMOCRAT"):
+#         # red stripes if winning party changed from republican to democrat
+#         return 1 
+#     if (row.party != "DEMOCRAT") and (row.prev_party != "REPUBLICAN"):
+#         # choose another color for non-dem/rep parties (there's only one other)
+#         return 2
 
-pres_county_winners["swing"]=pres_county_winners.apply(lambda x: swing(x),axis=1)
-pres_states_winners["swing"]=pres_states_winners.apply(lambda x: swing(x),axis=1)
+# pres_states_winners["swing"]=pres_states_winners.apply(lambda x: swing(x),axis=1)
 
 # list of USA states
 usa_states = [

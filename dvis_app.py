@@ -173,7 +173,7 @@ app.layout = html.Div([
                 }),
                 html.Div([
                     html.Div([
-                        html.Button("Select/Unselect All",id = "select-all-states", n_clicks = 0)
+                        html.Button("Select/Unselect All", id = "select-all-states", n_clicks = 0)
                     ],
                     style = {
                         "color": font_color,
@@ -791,12 +791,13 @@ def update_year_range_plots(year_range, data):
     # DC state_po gets assigned NaN, fixing that
     electoral_college_copy.loc[electoral_college_copy.State == "D.C.", "state_po"] = "DC"
     # determine number of democrat and republican votes
-    dem_votes = electoral_college_copy.loc[electoral_college_copy.Party == "DEMOCRAT", :].set_index("State")["Votes"]
-    rep_votes = electoral_college_copy.loc[electoral_college_copy.Party == "REPUBLICAN", :].set_index("State")["Votes"]
+    dem_votes = electoral_college_copy.loc[electoral_college_copy.Party == "DEMOCRAT", :].set_index("State")[["Votes", "state_po"]].sort_values("Votes", ascending = False)
+    rep_votes = electoral_college_copy.loc[electoral_college_copy.Party == "REPUBLICAN", :].set_index("State")[["Votes", "state_po"]].reindex(dem_votes.index)
     selected_states = data["states"]
+
     color_state = []
 
-    for state in electoral_college_copy.state_po.unique():
+    for state in dem_votes["state_po"].values.tolist():
         if state in selected_states:
             color_state.append(True)
         else:
@@ -813,18 +814,18 @@ def update_year_range_plots(year_range, data):
             return red
         else:
             return box_color
-
+            
     stacked_bars = go.Figure()
     stacked_bars.add_bar(
-        x = electoral_college_copy.State.unique(),
-        y = dem_votes/(dem_votes+rep_votes)*100,
+        x = dem_votes.index,
+        y = dem_votes["Votes"]/(dem_votes["Votes"]+rep_votes["Votes"])*100,
         marker_color = list(map(bar_color_democrat, color_state)),
         name = "Democrat",
         showlegend = False
     )
     stacked_bars.add_bar(
-        x = electoral_college_copy.State.unique(),
-        y = rep_votes/(dem_votes+rep_votes)*100,
+        x = rep_votes.index,
+        y = rep_votes["Votes"]/(dem_votes["Votes"]+rep_votes["Votes"])*100,
         marker_color = list(map(bar_color_republican, color_state)),
         name = "Republican",
         showlegend = False
@@ -1016,12 +1017,23 @@ def update_graph(year, data, presidential):
         hover_data = ["totalvotes"]
     )
 
+<<<<<<< HEAD
     scatter_geo=px.scatter_geo(graph_data[graph_data.party!="None"],locations="state_po",locationmode="USA-states",size="totalvotes", color=color_var,color_discrete_map=color_map,scope="usa",size_max=60)
+=======
+    scatter_geo = px.scatter_geo(
+        graph_data[graph_data.party!="None"],
+        locations="state_po",
+        locationmode="USA-states",
+        size="totalvotes",
+        color=color_var,
+        color_discrete_map=color_map,
+        scope="usa",
+        size_max=40
+    )
+>>>>>>> 5e4f4b5ecd436d80005e95e3ad7557a90fc6927e
     
     for trace in scatter_geo.data:
         usa_choropleth.add_trace(trace)
-
-
 
     usa_choropleth.add_scattergeo(
         locationmode = "USA-states",
@@ -1033,9 +1045,6 @@ def update_graph(year, data, presidential):
         hoverinfo = "skip",
         showlegend = False,
     )
-    
-    
-
 
     usa_choropleth.update_layout(
         margin = dict(l = 0, r = 0, b = 0, t = 0, pad = 4, autoexpand = True),
@@ -1053,8 +1062,8 @@ def update_graph(year, data, presidential):
         if choropleth.name == "":
             choropleth.colorscale=[[0.0, '#7fafdf'], [1.0, '#7fafdf']]
             choropleth.showlegend = False
-    return usa_choropleth
 
+    return usa_choropleth
 
 
 if __name__ == "__main__":
