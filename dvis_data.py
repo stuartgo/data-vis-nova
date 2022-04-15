@@ -5,6 +5,7 @@
 import pandas as pd
 import numpy as np
 import json
+import os
 ########
 
 def load_data():
@@ -15,12 +16,12 @@ def load_data():
     and information about each individual county in
     the USA.
     """
-
-    pres_states = pd.read_csv("/data/US_President.csv") # state-level presidential elections
-    senate = pd.read_csv("/data/US_Senate.csv", encoding = 'latin1') # senate elections
-    electoral_college = pd.read_csv("/data/Electoral_College.csv") # electoral college votes per state
-    census_2020 = pd.read_excel("/data/Census_2020.xlsx")
-    pres_bios = pd.read_excel("/data/President_Info.xlsx") # information on party candidates since 2000
+    dirname = os.path.dirname(__file__)
+    pres_states = pd.read_csv(os.path.join(dirname, "data/US_President.csv")) # state-level presidential elections
+    senate = pd.read_csv(os.path.join(dirname, "data/US_Senate.csv" ), encoding = 'latin1') # senate elections
+    electoral_college = pd.read_csv(os.path.join(dirname, "data/Electoral_College.csv")) # electoral college votes per state
+    census_2020 = pd.read_excel(os.path.join(dirname, "data/Census_2020.xlsx"))
+    pres_bios = pd.read_excel(os.path.join(dirname, "data/President_Info.xlsx")) # information on party candidates since 2000
     pres_bios.party = pres_bios.party.str.upper()
 
     # drop unecessary columns
