@@ -39,3 +39,4 @@ urllib3==1.26.8
 Werkzeug==2.0.3
 wincertstore==0.2
 zipp==3.7.0
+dash_daq==0.5.0
