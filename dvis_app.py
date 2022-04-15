@@ -15,12 +15,8 @@ from senateGraph import senate_graph
 ########
 
 # App layout
-external_scripts=[{
-    "src":"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js",
-    "ingegrity":"sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==",
-    "crossorigin":"anonymous"
-}]
-app = dash.Dash(__name__, external_scripts=external_scripts)
+
+app = dash.Dash(__name__)
 
 # commonly used colors
 background_color = "#1f2630"
