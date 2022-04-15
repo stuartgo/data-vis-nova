@@ -21,7 +21,7 @@ def load_data():
     senate = pd.read_csv(os.path.join(dirname, "data/US_Senate.csv" ), encoding = 'latin1') # senate elections
     electoral_college = pd.read_csv(os.path.join(dirname, "data/electoral_college.csv")) # electoral college votes per state
     census_2020 = pd.read_excel(os.path.join(dirname, "data/census_2020.xlsx"))
-    pres_bios = pd.read_excel(os.path.join(dirname, "data/president_info.xlsx")) # information on party candidates since 2000
+    pres_bios = pd.read_excel(os.path.join(dirname, "data/President_Info.xlsx")) # information on party candidates since 2000
     pres_bios.party = pres_bios.party.str.upper()
 
     # drop unecessary columns
