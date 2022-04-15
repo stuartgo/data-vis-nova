@@ -17,7 +17,7 @@ from senateGraph import senate_graph
 # App layout
 
 app = dash.Dash(__name__)
-
+server = app.server
 # commonly used colors
 background_color = "#1f2630"
 box_color = "#252e3f"

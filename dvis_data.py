@@ -16,11 +16,11 @@ def load_data():
     the USA.
     """
 
-    pres_states = pd.read_csv("./data/US_President.csv") # state-level presidential elections
-    senate = pd.read_csv("./data/US_Senate.csv", encoding = 'latin1') # senate elections
-    electoral_college = pd.read_csv("./data/Electoral_College.csv") # electoral college votes per state
-    census_2020 = pd.read_excel("./data/Census_2020.xlsx")
-    pres_bios = pd.read_excel("./data/President_Info.xlsx") # information on party candidates since 2000
+    pres_states = pd.read_csv("/data/US_President.csv") # state-level presidential elections
+    senate = pd.read_csv("/data/US_Senate.csv", encoding = 'latin1') # senate elections
+    electoral_college = pd.read_csv("/data/Electoral_College.csv") # electoral college votes per state
+    census_2020 = pd.read_excel("/data/Census_2020.xlsx")
+    pres_bios = pd.read_excel("/data/President_Info.xlsx") # information on party candidates since 2000
     pres_bios.party = pres_bios.party.str.upper()
 
     # drop unecessary columns
